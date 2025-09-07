@@ -129,7 +129,27 @@ graph TB
 
 </details>
 
-## 🚀 Getting Started
+## 📁 Project Structure
+
+```
+agentic-live-sales/
+├── README.md                    # Project documentation
+├── main-project/               # Main application code
+│   ├── src/                    # Source code
+│   │   ├── components/         # React components
+│   │   ├── services/           # AI agents and services
+│   │   ├── hooks/              # Custom React hooks
+│   │   ├── lib/                # Utility libraries
+│   │   ├── pages/              # Page components
+│   │   └── types/              # TypeScript type definitions
+│   ├── dist/                   # Build output
+│   ├── firebase.json           # Firebase configuration
+│   ├── package.json            # Dependencies and scripts
+│   └── vite.config.ts          # Vite configuration
+└── .git/                       # Git repository
+```
+
+
 
 ### Prerequisites
 
@@ -145,6 +165,9 @@ git clone https://github.com/Ronit-bby/agentic-live-sales.git
 
 # Navigate to project directory
 cd agentic-live-sales
+
+# Navigate to main project folder
+cd main-project
 
 # Install dependencies
 npm install
