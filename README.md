@@ -1,4 +1,6 @@
-# Agentic Meeting Studio
+# agentic-live-sales
+>>>>>>> f3aba79c0423dbb43c9488197f3d886eb2257146
+# Agentic Live Sales
 
 A production-ready meeting intelligence platform powered by AI agents, real-time transcription, and complete provenance tracking.
 
@@ -188,3 +190,6 @@ Every AI agent output includes complete provenance information:
 ## License
 
 MIT License - see LICENSE file for details
+=======
+# agentic-live-sales
+>>>>>>> f3aba79c0423dbb43c9488197f3d886eb2257146
