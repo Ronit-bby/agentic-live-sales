@@ -1,14 +1,17 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Users, Clock, Settings } from 'lucide-react';
-import { TranscriptionService } from '../services/transcription';
+import { WhisperTranscriptionService } from '../services/transcription';
 import { createAIAgents } from '../services/aiAgents';
+import { firestoreService } from '../services/firestore';
+import { openAIService } from '../services/openai';
 import { MeetingSession, TranscriptEntry, AgentOutput } from '../types';
 import { TranscriptPanel } from '../components/Meeting/TranscriptPanel';
 import { AgentPanel } from '../components/Meeting/AgentPanel';
 import { RecordingControls } from '../components/Meeting/RecordingControls';
 import { GlassCard } from '../components/Layout/GlassCard';
 import { AnimatedBackground } from '../components/Layout/AnimatedBackground';
+import { useAuth } from '../hooks/useAuth';
 
 interface MeetingProps {
   sessionId: string;
@@ -17,28 +20,91 @@ interface MeetingProps {
 }
 
 export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBack, onBackToLanding }) => {
+  const { user } = useAuth();
   const [session, setSession] = useState<MeetingSession | null>(null);
   const [transcriptEntries, setTranscriptEntries] = useState<TranscriptEntry[]>([]);
   const [agentOutputs, setAgentOutputs] = useState<AgentOutput[]>([]);
   const [isRecording, setIsRecording] = useState(false);
   const [startTime, setStartTime] = useState<Date | null>(null);
   const [duration, setDuration] = useState(0);
-  const [transcriptionService] = useState(() => new TranscriptionService());
+  const [transcriptionService] = useState(() => new WhisperTranscriptionService());
   const [aiAgents] = useState(() => createAIAgents());
   const [currentTranscript, setCurrentTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
+  const [isAIProcessing, setIsAIProcessing] = useState(false);
+  const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
+  const [transcriptionMethod, setTranscriptionMethod] = useState('');
 
-  // Mock user for demo
-  const mockUser = {
+  // Firebase unsubscribe functions
+  const [unsubscribeTranscripts, setUnsubscribeTranscripts] = useState<(() => void) | null>(null);
+  const [unsubscribeOutputs, setUnsubscribeOutputs] = useState<(() => void) | null>(null);
+
+  // Mock user for demo - use real user when available
+  const currentUser = user || {
     uid: 'demo-user',
     displayName: 'Demo User',
     email: 'demo@example.com'
   };
 
   useEffect(() => {
-    loadSession();
-    loadStoredData();
+    initializeSession();
+    setupFirebaseListeners();
+    checkSystemStatus();
+    
+    return () => {
+      // Cleanup Firebase listeners
+      if (unsubscribeTranscripts) unsubscribeTranscripts();
+      if (unsubscribeOutputs) unsubscribeOutputs();
+    };
   }, [sessionId]);
+
+  // System status check
+  const checkSystemStatus = async () => {
+    try {
+      setConnectionStatus('connecting');
+      const isConnected = await firestoreService.testConnection();
+      setConnectionStatus(isConnected ? 'connected' : 'disconnected');
+      setTranscriptionMethod(transcriptionService.getTranscriptionMethod());
+    } catch (error) {
+      console.error('System status check failed:', error);
+      setConnectionStatus('disconnected');
+    }
+  };
+
+  // Setup Firebase real-time listeners
+  const setupFirebaseListeners = () => {
+    // Listen to transcript entries
+    const unsubTranscripts = firestoreService.subscribeToTranscriptEntries(
+      sessionId,
+      (entries) => {
+        setTranscriptEntries(entries);
+      }
+    );
+    setUnsubscribeTranscripts(() => unsubTranscripts);
+
+    // Listen to agent outputs
+    const unsubOutputs = firestoreService.subscribeToAgentOutputs(
+      sessionId,
+      (outputs) => {
+        setAgentOutputs(outputs);
+        setIsAIProcessing(false); // AI processing completed
+      }
+    );
+    setUnsubscribeOutputs(() => unsubOutputs);
+  };
+
+  // Process new transcript entries with AI agents
+  useEffect(() => {
+    if (transcriptEntries.length === 0) return;
+
+    const latestEntry = transcriptEntries[transcriptEntries.length - 1];
+    // Only process if this is a new entry (not from initial load)
+    const isNewEntry = transcriptEntries.length > 1 || isRecording;
+    
+    if (isNewEntry && latestEntry.text.length > 10) { // Only process meaningful text
+      processWithAIAgents(latestEntry);
+    }
+  }, [transcriptEntries.length]);
 
   // Duration timer
   useEffect(() => {
@@ -51,16 +117,54 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBack, onBackToLan
     return () => clearInterval(interval);
   }, [isRecording, startTime]);
 
-  // Process new transcript entries with AI agents
-  useEffect(() => {
-    if (transcriptEntries.length === 0) return;
+  const initializeSession = async () => {
+    try {
+      // Try to load existing sessions for this user
+      const existingSessions = await firestoreService.getMeetingSessions(currentUser.uid);
+      const existingSession = existingSessions.find(s => s.id === sessionId);
+      
+      if (existingSession) {
+        setSession(existingSession);
+      } else {
+        // Create new session if not found
+        const newSession: MeetingSession = {
+          id: sessionId,
+          title: `Meeting Session - ${new Date().toLocaleString()}`,
+          createdAt: new Date(),
+          updatedAt: new Date(),
+          userId: currentUser.uid,
+          isActive: false,
+          participants: [currentUser.displayName || 'User'],
+          duration: 0
+        };
+        
+        try {
+          // Try to create in Firebase first
+          await firestoreService.createMeetingSession(newSession);
+          setSession(newSession);
+        } catch (error) {
+          console.error('Failed to create session in Firebase, using local storage:', error);
+          // Fallback to localStorage
+          setSession(newSession);
+          saveSessionToLocalStorage(newSession);
+        }
+      }
+    } catch (error) {
+      console.error('Failed to initialize session from Firebase, using fallback:', error);
+      loadSessionFromLocalStorage();
+    }
+  };
 
-    const latestEntry = transcriptEntries[transcriptEntries.length - 1];
-    processWithAIAgents(latestEntry);
-  }, [transcriptEntries.length]);
+  const saveSessionToLocalStorage = (sessionToSave: MeetingSession) => {
+    const savedSessions = localStorage.getItem('meetingSessions');
+    const sessions = savedSessions ? JSON.parse(savedSessions) : [];
+    const updatedSessions = sessions.filter((s: any) => s.id !== sessionId);
+    updatedSessions.push(sessionToSave);
+    localStorage.setItem('meetingSessions', JSON.stringify(updatedSessions));
+  };
 
-  const loadSession = () => {
-    // Load session from localStorage or create new one
+  const loadSessionFromLocalStorage = () => {
+    // Fallback to localStorage for offline mode
     const savedSessions = localStorage.getItem('meetingSessions');
     if (savedSessions) {
       const sessions = JSON.parse(savedSessions);
@@ -76,87 +180,105 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBack, onBackToLan
     }
     
     // Create default session if not found
-    setSession({
+    const defaultSession: MeetingSession = {
       id: sessionId,
-      title: 'Current Meeting Session',
+      title: 'Meeting Session (Offline)',
       createdAt: new Date(),
       updatedAt: new Date(),
-      userId: mockUser.uid,
+      userId: currentUser.uid,
       isActive: false,
-      participants: [mockUser.displayName],
+      participants: [currentUser.displayName || 'User'],
       duration: 0
-    });
+    };
+    setSession(defaultSession);
+    saveSessionToLocalStorage(defaultSession);
   };
 
-  const loadStoredData = () => {
-    // Load transcript entries from localStorage
-    const savedTranscripts = localStorage.getItem(`transcripts-${sessionId}`);
-    if (savedTranscripts) {
-      const transcripts = JSON.parse(savedTranscripts).map((entry: any) => ({
-        ...entry,
-        timestamp: new Date(entry.timestamp)
-      }));
-      setTranscriptEntries(transcripts);
-    }
-
-    // Load agent outputs from localStorage
-    const savedOutputs = localStorage.getItem(`agentOutputs-${sessionId}`);
-    if (savedOutputs) {
-      const outputs = JSON.parse(savedOutputs).map((output: any) => ({
-        ...output,
-        createdAt: new Date(output.createdAt),
-        provenance: {
-          ...output.provenance,
-          timestamp: new Date(output.provenance.timestamp)
-        }
-      }));
-      setAgentOutputs(outputs);
-    }
-  };
-
-  const saveTranscriptEntry = (entry: TranscriptEntry) => {
-    const newEntries = [...transcriptEntries, entry];
-    setTranscriptEntries(newEntries);
-    localStorage.setItem(`transcripts-${sessionId}`, JSON.stringify(newEntries));
-  };
-
-  const saveAgentOutput = (output: AgentOutput) => {
-    const newOutputs = [...agentOutputs, output];
-    setAgentOutputs(newOutputs);
-    localStorage.setItem(`agentOutputs-${sessionId}`, JSON.stringify(newOutputs));
-  };
-
+  // Real-time AI processing with Firebase streaming
   const processWithAIAgents = async (transcriptEntry: TranscriptEntry) => {
-    // Process with each AI agent
-    for (const [agentId, agent] of aiAgents) {
-      try {
-        const context = transcriptEntries
-          .slice(-5)
-          .map(entry => entry.text)
-          .join(' ');
+    if (isAIProcessing) return; // Prevent concurrent processing
+    
+    setIsAIProcessing(true);
+    
+    // Get recent context from Firebase
+    try {
+      const recentEntries = await firestoreService.getLatestTranscriptEntries(sessionId, 5);
+      const context = recentEntries.map(entry => entry.text).join(' ');
+      
+      // Process with each AI agent in parallel for faster results
+      const agentPromises = Array.from(aiAgents.entries()).map(async ([agentId, agent]) => {
+        try {
+          if (openAIService.isReady()) {
+            // Use streaming analysis for real-time updates
+            const outputId = await firestoreService.streamAgentOutput(
+              sessionId,
+              agentId,
+              {
+                agent_id: agentId,
+                timestamp: new Date(),
+                inputs: {
+                  transcript_segment: transcriptEntry.text,
+                  context,
+                  previous_outputs: []
+                },
+                confidence: 0,
+                trace_id: `${agentId}-${Date.now()}`
+              },
+              () => {} // Updates handled by Firebase listener
+            );
 
-        const provenance = await agent.analyze(transcriptEntry.text, context);
-        
-        const agentOutput: AgentOutput = {
-          id: `${agentId}-${Date.now()}`,
-          sessionId,
-          agentType: agentId as any,
-          provenance,
-          createdAt: new Date()
-        };
+            // Stream the analysis and update Firebase in real-time
+            let analysisText = '';
+            await agent.streamAnalysis(
+              transcriptEntry.text,
+              context,
+              (chunk) => {
+                analysisText += chunk;
+                // Update Firebase with streaming content
+                firestoreService.updateStreamingAgentOutput(outputId, {
+                  analysis: analysisText
+                }).catch(console.error);
+              }
+            );
+          } else {
+            // Fallback to regular analysis
+            const provenance = await agent.analyze(transcriptEntry.text, context);
+            
+            const agentOutput: AgentOutput = {
+              id: `${agentId}-${Date.now()}`,
+              sessionId,
+              agentType: agentId as any,
+              provenance,
+              createdAt: new Date()
+            };
 
-        saveAgentOutput(agentOutput);
-      } catch (error) {
-        console.error(`Error processing with ${agentId} agent:`, error);
-      }
+            await firestoreService.addAgentOutput(agentOutput);
+          }
+        } catch (error) {
+          console.error(`Error processing with ${agentId} agent:`, error);
+        }
+      });
+
+      await Promise.all(agentPromises);
+    } catch (error) {
+      console.error('Error in AI processing:', error);
+      setIsAIProcessing(false);
     }
   };
 
   const handleStartRecording = async () => {
     const success = await transcriptionService.startTranscription(
       sessionId,
-      (entry) => {
-        saveTranscriptEntry(entry);
+      async (entry) => {
+        try {
+          await firestoreService.addTranscriptEntry(entry);
+          // AI processing will be triggered by Firebase listener
+        } catch (error) {
+          console.error('Failed to save transcript to Firebase:', error);
+          // Fallback: process locally and save to localStorage
+          setTranscriptEntries(prev => [...prev, entry]);
+          processWithAIAgents(entry);
+        }
       },
       (error) => {
         console.error('Transcription error:', error);
@@ -172,45 +294,50 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBack, onBackToLan
       const now = new Date();
       setStartTime(now);
       
-      // Update session status in localStorage
+      // Update session status
       if (session) {
         const updatedSession = {
           ...session,
           isActive: true,
           updatedAt: now
         };
-        setSession(updatedSession);
-        updateSessionInStorage(updatedSession);
+        
+        try {
+          await firestoreService.updateMeetingSession(sessionId, updatedSession);
+          setSession(updatedSession);
+        } catch (error) {
+          console.error('Failed to update session in Firebase:', error);
+          // Fallback to localStorage
+          setSession(updatedSession);
+          saveSessionToLocalStorage(updatedSession);
+        }
       }
     }
   };
 
-  const handleStopRecording = () => {
+  const handleStopRecording = async () => {
     transcriptionService.stopTranscription();
     setIsRecording(false);
-    setInterimTranscript(''); // Clear interim text when stopping
+    setInterimTranscript('');
     
     if (session && startTime) {
-      const finalDuration = Math.floor((Date.now() - startTime.getTime()) / 60000); // Convert to minutes
+      const finalDuration = Math.floor((Date.now() - startTime.getTime()) / 60000);
       const updatedSession = {
         ...session,
         isActive: false,
         duration: finalDuration,
         updatedAt: new Date()
       };
-      setSession(updatedSession);
-      updateSessionInStorage(updatedSession);
-    }
-  };
-
-  const updateSessionInStorage = (updatedSession: MeetingSession) => {
-    const savedSessions = localStorage.getItem('meetingSessions');
-    if (savedSessions) {
-      const sessions = JSON.parse(savedSessions);
-      const updatedSessions = sessions.map((s: any) => 
-        s.id === sessionId ? updatedSession : s
-      );
-      localStorage.setItem('meetingSessions', JSON.stringify(updatedSessions));
+      
+      try {
+        await firestoreService.updateMeetingSession(sessionId, updatedSession);
+        setSession(updatedSession);
+      } catch (error) {
+        console.error('Failed to update session in Firebase:', error);
+        // Fallback to localStorage
+        setSession(updatedSession);
+        saveSessionToLocalStorage(updatedSession);
+      }
     }
   };
 
@@ -316,11 +443,27 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBack, onBackToLan
               <span>Transcripts: {transcriptEntries.length}</span>
               <span>AI Insights: {agentOutputs.length}</span>
               <span>Agents Active: {aiAgents.size}</span>
+              <span className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${
+                  connectionStatus === 'connected' ? 'bg-emerald-400' :
+                  connectionStatus === 'connecting' ? 'bg-yellow-400' : 'bg-red-400'
+                }`} />
+                Firebase: {connectionStatus}
+              </span>
+              <span>Transcription: {transcriptionMethod}</span>
             </div>
             
-            <div className="flex items-center gap-2">
-              <div className={`w-2 h-2 rounded-full ${isRecording ? 'bg-emerald-400' : 'bg-slate-500'}`} />
-              <span>{isRecording ? 'Live' : 'Stopped'}</span>
+            <div className="flex items-center gap-4">
+              {isAIProcessing && (
+                <div className="flex items-center gap-2 text-blue-400">
+                  <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
+                  <span>AI Processing...</span>
+                </div>
+              )}
+              <div className="flex items-center gap-2">
+                <div className={`w-2 h-2 rounded-full ${isRecording ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                <span>{isRecording ? 'Live' : 'Stopped'}</span>
+              </div>
             </div>
           </div>
         </motion.div>
