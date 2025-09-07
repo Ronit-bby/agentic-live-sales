@@ -1,18 +1,34 @@
 import { initializeApp } from 'firebase/app';
 import { getAuth } from 'firebase/auth';
 import { getFirestore } from 'firebase/firestore';
+import { getAnalytics } from 'firebase/analytics';
+import { isSupported } from 'firebase/analytics';
 
 const firebaseConfig = {
-  // These will be replaced with actual config values when deployed
-  apiKey: import.meta.env.VITE_FIREBASE_API_KEY || "demo-key",
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN || "demo-project.firebaseapp.com",
-  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID || "demo-project",
-  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET || "demo-project.appspot.com",
-  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID || "123456789",
-  appId: import.meta.env.VITE_FIREBASE_APP_ID || "demo-app-id"
+  apiKey: "AIzaSyCjebcEsTgfbTAD76EgZgymEA10tcUjIlg",
+  authDomain: "agentic-meeting-studio.firebaseapp.com",
+  projectId: "agentic-meeting-studio",
+  storageBucket: "agentic-meeting-studio.firebasestorage.app",
+  messagingSenderId: "631848199824",
+  appId: "1:631848199824:web:a8be043e9863ab8ea81a15",
+  measurementId: "G-TTM990Q3SQ"
 };
 
+// Initialize Firebase
 const app = initializeApp(firebaseConfig);
+
+// Initialize Firebase services
 export const auth = getAuth(app);
 export const db = getFirestore(app);
+
+// Initialize Analytics (only in browser environment)
+export let analytics: any = null;
+if (typeof window !== 'undefined') {
+  isSupported().then((supported) => {
+    if (supported) {
+      analytics = getAnalytics(app);
+    }
+  });
+}
+
 export default app;

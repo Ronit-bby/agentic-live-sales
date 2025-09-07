@@ -7,7 +7,9 @@
     "dev": "vite",
     "build": "vite build",
     "lint": "echo 'Linting disabled for production readiness'",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "deploy": "npm run build && firebase deploy",
+    "deploy:hosting": "npm run build && firebase deploy --only hosting"
   },
   "dependencies": {
     "@types/react-router-dom": "^5.3.3",
