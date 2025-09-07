@@ -15,6 +15,24 @@
   scrollbar-color: rgba(255, 255, 255, 0.3) transparent;
 }
 
+/* Specific styles for agent panel scrollbars */
+.scrollbar-track-slate-800\/30::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.3);
+}
+
+.scrollbar-thumb-slate-600\/50::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.5);
+}
+
+.scrollbar-thumb-slate-600\/50:hover::-webkit-scrollbar-thumb,
+.hover\:scrollbar-thumb-slate-500\/70:hover::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.7);
+}
+
+.scrollbar-track-slate-700\/30::-webkit-scrollbar-track {
+  background: rgba(51, 65, 85, 0.3);
+}
+
 /* Webkit scrollbar styles for better browser support */
 .scrollbar-thin::-webkit-scrollbar {
   width: 6px;

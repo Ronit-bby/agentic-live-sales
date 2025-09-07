@@ -92,48 +92,50 @@ export const AgentPanel: React.FC<AgentPanelProps> = ({ agentOutputs }) => {
         </div>
 
         {/* Agent Outputs */}
-        <div className="flex-1 overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-track-slate-800/50 scrollbar-thumb-slate-600/70 hover:scrollbar-thumb-slate-500">
-          <AnimatePresence>
-            {selectedAgent ? (
-              <motion.div
-                key={selectedAgent}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                className="space-y-4"
-              >
-                {groupedOutputs[selectedAgent]?.map((output) => (
-                  <AgentOutputCard
-                    key={output.id}
-                    output={output}
-                    agentType={getAgentType(output.agentType)!}
-                    isExpanded={expandedOutput === output.id}
-                    onToggleExpanded={() => 
-                      setExpandedOutput(expandedOutput === output.id ? null : output.id)
-                    }
-                    formatTime={formatTime}
-                  />
-                )) || (
-                  <div className="text-center text-slate-500 py-8">
-                    No insights yet from this agent
+        <div className="flex-1 min-h-0 overflow-hidden">
+          <div className="h-full overflow-y-auto p-4 space-y-4 scrollbar-thin scrollbar-track-slate-800/30 scrollbar-thumb-slate-600/50 hover:scrollbar-thumb-slate-500/70">
+            <AnimatePresence>
+              {selectedAgent ? (
+                <motion.div
+                  key={selectedAgent}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: -20 }}
+                  className="space-y-4"
+                >
+                  {groupedOutputs[selectedAgent]?.map((output) => (
+                    <AgentOutputCard
+                      key={output.id}
+                      output={output}
+                      agentType={getAgentType(output.agentType)!}
+                      isExpanded={expandedOutput === output.id}
+                      onToggleExpanded={() => 
+                        setExpandedOutput(expandedOutput === output.id ? null : output.id)
+                      }
+                      formatTime={formatTime}
+                    />
+                  )) || (
+                    <div className="text-center text-slate-500 py-8">
+                      No insights yet from this agent
+                    </div>
+                  )}
+                </motion.div>
+              ) : (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  className="text-center text-slate-500 py-8"
+                >
+                  <div className="space-y-2">
+                    <p>Select an agent to view insights</p>
+                    <p className="text-sm text-slate-600">
+                      AI agents will analyze your speech in real-time
+                    </p>
                   </div>
-                )}
-              </motion.div>
-            ) : (
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="text-center text-slate-500 py-8"
-              >
-                <div className="space-y-2">
-                  <p>Select an agent to view insights</p>
-                  <p className="text-sm text-slate-600">
-                    AI agents will analyze your speech in real-time
-                  </p>
-                </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
         </div>
       </div>
     </GlassCard>
@@ -188,21 +190,25 @@ const AgentOutputCard: React.FC<AgentOutputCardProps> = ({
       <div className="space-y-3">
         <div>
           <h4 className="text-sm font-medium text-slate-200 mb-1">Analysis</h4>
-          <p className="text-sm text-slate-300 leading-relaxed">
-            {output.provenance.outputs.analysis}
-          </p>
+          <div className="max-h-24 overflow-y-auto scrollbar-thin scrollbar-track-slate-700/30 scrollbar-thumb-slate-600/50">
+            <p className="text-sm text-slate-300 leading-relaxed pr-2">
+              {output.provenance.outputs.analysis}
+            </p>
+          </div>
         </div>
 
         <div>
           <h4 className="text-sm font-medium text-slate-200 mb-2">Key Insights</h4>
-          <ul className="space-y-1">
-            {output.provenance.outputs.insights.map((insight, index) => (
-              <li key={index} className="text-sm text-slate-300 flex items-start gap-2">
-                <span className="text-blue-400 mt-1">•</span>
-                {insight}
-              </li>
-            ))}
-          </ul>
+          <div className="max-h-32 overflow-y-auto scrollbar-thin scrollbar-track-slate-700/30 scrollbar-thumb-slate-600/50">
+            <ul className="space-y-1 pr-2">
+              {output.provenance.outputs.insights.map((insight, index) => (
+                <li key={index} className="text-sm text-slate-300 flex items-start gap-2">
+                  <span className="text-blue-400 mt-1 flex-shrink-0">•</span>
+                  <span className="leading-relaxed">{insight}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
         </div>
 
         {isExpanded && (
@@ -217,14 +223,16 @@ const AgentOutputCard: React.FC<AgentOutputCardProps> = ({
                 <Info className="w-3 h-3" />
                 Reasoning Chain
               </h4>
-              <ol className="space-y-2">
-                {output.provenance.outputs.reasoning_chain.map((step, index) => (
-                  <li key={index} className="text-xs text-slate-400 flex gap-2">
-                    <span className="text-blue-400">{index + 1}.</span>
-                    {step}
-                  </li>
-                ))}
-              </ol>
+              <div className="max-h-40 overflow-y-auto scrollbar-thin scrollbar-track-slate-700/30 scrollbar-thumb-slate-600/50">
+                <ol className="space-y-2 pr-2">
+                  {output.provenance.outputs.reasoning_chain.map((step, index) => (
+                    <li key={index} className="text-xs text-slate-400 flex gap-2">
+                      <span className="text-blue-400 flex-shrink-0">{index + 1}.</span>
+                      <span className="leading-relaxed">{step}</span>
+                    </li>
+                  ))}
+                </ol>
+              </div>
             </div>
 
             <div className="grid grid-cols-2 gap-4 text-xs">
