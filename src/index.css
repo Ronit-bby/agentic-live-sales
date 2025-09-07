@@ -2,9 +2,66 @@
 @tailwind components;
 @tailwind utilities;
 
+/* Responsive breakpoint utilities */
+@media (max-width: 475px) {
+  .xs\:grid-cols-1 { grid-template-columns: repeat(1, minmax(0, 1fr)); }
+  .xs\:text-xs { font-size: 0.75rem; }
+  .xs\:p-2 { padding: 0.5rem; }
+}
+
+@media (min-width: 475px) {
+  .xs\:grid-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+
+/* Mobile-first responsive design */
+@media (max-width: 640px) {
+  .mobile-stack { flex-direction: column !important; }
+  .mobile-full { width: 100% !important; }
+  .mobile-hide { display: none !important; }
+  .mobile-text-sm { font-size: 0.875rem !important; }
+}
+
+/* Tablet responsive design */
+@media (min-width: 641px) and (max-width: 1024px) {
+  .tablet-cols-2 { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .tablet-p-4 { padding: 1rem !important; }
+}
+
+/* Desktop responsive design */
+@media (min-width: 1025px) {
+  .desktop-cols-3 { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  .desktop-p-6 { padding: 1.5rem !important; }
+}
+
 /* Custom scrollbar styles */
 .scrollbar-thin {
   scrollbar-width: thin;
+  scroll-behavior: smooth;
+}
+
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.5);
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
+}
+
+/* Fast scrolling for live insights */
+.scrollbar-thin::-webkit-scrollbar-corner {
+  background: transparent;
 }
 
 .scrollbar-track-white\/10 {
@@ -31,6 +88,48 @@
 
 .scrollbar-track-slate-700\/30::-webkit-scrollbar-track {
   background: rgba(51, 65, 85, 0.3);
+}
+
+/* Enhanced agent panel scroll styles */
+.scrollbar-track-slate-800\/30 {
+  scrollbar-color: rgba(71, 85, 105, 0.5) rgba(30, 41, 59, 0.3);
+}
+
+.scrollbar-thumb-slate-600\/50 {
+  scrollbar-color: rgba(71, 85, 105, 0.5) transparent;
+}
+
+/* Live insights enhanced scrolling */
+.scrollbar-track-slate-800\/30::-webkit-scrollbar-track {
+  background: rgba(30, 41, 59, 0.3);
+  border-radius: 4px;
+}
+
+.scrollbar-thumb-slate-600\/50::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.5);
+  border-radius: 4px;
+  border: 1px solid rgba(30, 41, 59, 0.2);
+}
+
+.scrollbar-thumb-slate-600\/50:hover::-webkit-scrollbar-thumb,
+.hover\:scrollbar-thumb-slate-500\/70:hover::-webkit-scrollbar-thumb {
+  background: rgba(100, 116, 139, 0.7);
+  border: 1px solid rgba(71, 85, 105, 0.3);
+}
+
+.scrollbar-track-slate-700\/30::-webkit-scrollbar-track {
+  background: rgba(51, 65, 85, 0.3);
+  border-radius: 4px;
+}
+
+/* Smooth scroll behavior for all containers */
+.max-h-80, .max-h-96, .max-h-24, .max-h-32 {
+  scroll-behavior: smooth;
+  overscroll-behavior: contain;
+}
+
+.hover\:scrollbar-thumb-slate-500\/70 {
+  scrollbar-color: rgba(100, 116, 139, 0.7) transparent;
 }
 
 /* Webkit scrollbar styles for better browser support */

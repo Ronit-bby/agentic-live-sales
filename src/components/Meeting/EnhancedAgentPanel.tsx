@@ -1,0 +1,1 @@
+export { AgentPanel as EnhancedAgentPanel } from './AgentPanel';

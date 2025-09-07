@@ -1,6 +1,6 @@
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Mic, MicOff, Square, Play } from 'lucide-react';
+import { Mic, Square } from 'lucide-react';
 
 interface RecordingControlsProps {
   isRecording: boolean;

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Calendar, Clock, Users, Settings, Trash2 } from 'lucide-react';
+import { Plus, Calendar, Clock, Users, Trash2 } from 'lucide-react';
 import { MeetingSession } from '../types';
 import { GlassCard } from '../components/Layout/GlassCard';
 import { AnimatedBackground } from '../components/Layout/AnimatedBackground';
@@ -16,7 +16,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartMeeting }) => {
   const [createModalOpen, setCreateModalOpen] = useState(false);
   const [newSessionTitle, setNewSessionTitle] = useState('');
 
-  // Mock user for demo purposes
   const mockUser = {
     uid: 'demo-user',
     displayName: 'Demo User',
@@ -24,15 +23,18 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartMeeting }) => {
   };
 
   useEffect(() => {
-    // Load sessions from localStorage for demo
     const savedSessions = localStorage.getItem('meetingSessions');
     if (savedSessions) {
-      const parsed = JSON.parse(savedSessions).map((session: any) => ({
-        ...session,
-        createdAt: new Date(session.createdAt),
-        updatedAt: new Date(session.updatedAt)
-      }));
-      setSessions(parsed);
+      try {
+        const parsed = JSON.parse(savedSessions).map((session: any) => ({
+          ...session,
+          createdAt: new Date(session.createdAt),
+          updatedAt: new Date(session.updatedAt)
+        }));
+        setSessions(parsed);
+      } catch {
+        localStorage.removeItem('meetingSessions');
+      }
     }
     setLoading(false);
   }, []);
@@ -65,7 +67,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartMeeting }) => {
   };
 
   const handleDeleteSession = async (sessionId: string) => {
-    if (window.confirm('Are you sure you want to delete this meeting? This action cannot be undone.')) {
+    if (window.confirm('Are you sure you want to delete this meeting?')) {
       const newSessions = sessions.filter(s => s.id !== sessionId);
       saveSessions(newSessions);
     }
@@ -93,7 +95,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartMeeting }) => {
       <AnimatedBackground />
       
       <div className="relative z-10">
-        {/* Header */}
         <motion.header
           className="p-6 border-b border-white/20"
           initial={{ opacity: 0, y: -20 }}
@@ -119,15 +120,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartMeeting }) => {
           </div>
         </motion.header>
 
-        {/* Main Content */}
         <div className="max-w-7xl mx-auto p-6">
-          {/* Stats Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mb-8">
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.1 }}
-            >
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 mb-6 sm:mb-8">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}>
               <GlassCard className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-blue-500/20 rounded-lg">
@@ -141,11 +136,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartMeeting }) => {
               </GlassCard>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}>
               <GlassCard className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-green-500/20 rounded-lg">
@@ -161,11 +152,7 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartMeeting }) => {
               </GlassCard>
             </motion.div>
 
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.3 }}
-            >
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
               <GlassCard className="p-6">
                 <div className="flex items-center gap-4">
                   <div className="p-3 bg-purple-500/20 rounded-lg">
@@ -182,70 +169,50 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartMeeting }) => {
             </motion.div>
           </div>
 
-          {/* Meeting Sessions */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.4 }}>
             <GlassCard className="p-6">
               <div className="flex items-center justify-between mb-6">
                 <h2 className="text-xl font-semibold text-white">Recent Meetings</h2>
               </div>
 
               {loading ? (
-                <div className="text-center py-8 text-white/50">
-                  Loading meetings...
-                </div>
+                <div className="text-center py-8 text-white/50">Loading meetings...</div>
               ) : sessions.length === 0 ? (
                 <div className="text-center py-12">
-                  <Calendar className="w-16 h-16 text-white/30 mx-auto mb-4" />
-                  <h3 className="text-lg font-medium text-white mb-2">No meetings yet</h3>
-                  <p className="text-white/70 mb-6">Create your first meeting to get started with AI-powered analysis</p>
+                  <div className="text-white/70 mb-4">No meetings yet. Create your first meeting to get started!</div>
                   <motion.button
                     onClick={() => setCreateModalOpen(true)}
-                    className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-lg"
+                    className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                     whileHover={{ scale: 1.05 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    Create First Meeting
+                    <Plus className="w-4 h-4 inline mr-2" />
+                    Create Meeting
                   </motion.button>
                 </div>
               ) : (
                 <div className="space-y-4">
-                  {sessions.map((session, index) => (
+                  {sessions.map((session) => (
                     <motion.div
                       key={session.id}
-                      initial={{ opacity: 0, x: -20 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.1 * index }}
-                      className="p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all group"
+                      className="p-4 bg-white/5 border border-white/10 rounded-lg hover:bg-white/10 transition-all"
+                      whileHover={{ scale: 1.02 }}
                     >
                       <div className="flex items-center justify-between">
                         <div className="flex-1">
-                          <h3 className="text-lg font-semibold text-white mb-1">
-                            {session.title}
-                          </h3>
-                          <div className="flex items-center gap-4 text-sm text-white/70">
-                            <div className="flex items-center gap-1">
-                              <Calendar className="w-4 h-4" />
-                              {formatDate(session.createdAt)}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Clock className="w-4 h-4" />
-                              {formatDuration(session.duration)}
-                            </div>
-                            <div className="flex items-center gap-1">
-                              <Users className="w-4 h-4" />
-                              {session.participants.length} participants
-                            </div>
+                          <h3 className="text-lg font-medium text-white">{session.title}</h3>
+                          <div className="flex items-center gap-4 mt-2 text-sm text-white/60">
+                            <span>{formatDate(session.createdAt)}</span>
+                            <span>•</span>
+                            <span>{session.participants.length} participant{session.participants.length !== 1 ? 's' : ''}</span>
+                            <span>•</span>
+                            <span>{formatDuration(session.duration)}</span>
                           </div>
                         </div>
-                        
-                        <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                        <div className="flex items-center gap-2">
                           <motion.button
                             onClick={() => onStartMeeting(session.id)}
-                            className="px-4 py-2 bg-blue-500/20 hover:bg-blue-500/30 text-blue-300 rounded-lg font-medium transition-all"
+                            className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-colors"
                             whileHover={{ scale: 1.05 }}
                             whileTap={{ scale: 0.95 }}
                           >
@@ -253,8 +220,8 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartMeeting }) => {
                           </motion.button>
                           <motion.button
                             onClick={() => handleDeleteSession(session.id)}
-                            className="p-2 text-red-400 hover:bg-red-500/20 rounded-lg transition-all"
-                            whileHover={{ scale: 1.05 }}
+                            className="p-2 text-red-400 hover:text-red-300 transition-colors"
+                            whileHover={{ scale: 1.1 }}
                             whileTap={{ scale: 0.95 }}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -269,60 +236,40 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartMeeting }) => {
           </motion.div>
         </div>
 
-        {/* Create Meeting Modal */}
         {createModalOpen && (
-          <motion.div
-            className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center p-4"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            onClick={(e) => e.target === e.currentTarget && setCreateModalOpen(false)}
-          >
+          <div className="fixed inset-0 bg-black/50 flex items-center justify-center p-4 z-50">
             <motion.div
-              initial={{ opacity: 0, scale: 0.95 }}
+              className="bg-slate-800 border border-slate-700 rounded-xl p-6 w-full max-w-md"
+              initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
-              className="w-full max-w-md"
             >
-              <GlassCard className="p-6">
-                <h3 className="text-xl font-semibold text-white mb-4">Create New Meeting</h3>
-                
-                <div className="space-y-4">
-                  <div>
-                    <label className="block text-white/80 text-sm font-medium mb-2">
-                      Meeting Title
-                    </label>
-                    <input
-                      type="text"
-                      value={newSessionTitle}
-                      onChange={(e) => setNewSessionTitle(e.target.value)}
-                      placeholder="Enter meeting title..."
-                      className="w-full px-4 py-3 bg-white/10 border border-white/20 rounded-lg text-white placeholder-white/50 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:border-transparent transition-all"
-                      autoFocus
-                    />
-                  </div>
-                  
-                  <div className="flex gap-3 pt-4">
-                    <motion.button
-                      onClick={handleCreateSession}
-                      disabled={!newSessionTitle.trim()}
-                      className="flex-1 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-lg disabled:opacity-50 disabled:cursor-not-allowed transition-all"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Create & Start
-                    </motion.button>
-                    <motion.button
-                      onClick={() => setCreateModalOpen(false)}
-                      className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium rounded-lg transition-all"
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                    >
-                      Cancel
-                    </motion.button>
-                  </div>
-                </div>
-              </GlassCard>
+              <h2 className="text-xl font-semibold text-white mb-4">Create New Meeting</h2>
+              <input
+                type="text"
+                placeholder="Meeting title..."
+                value={newSessionTitle}
+                onChange={(e) => setNewSessionTitle(e.target.value)}
+                className="w-full p-3 bg-slate-700 border border-slate-600 rounded-lg text-white placeholder-slate-400 focus:border-blue-500 focus:outline-none"
+                autoFocus
+                onKeyPress={(e) => e.key === 'Enter' && handleCreateSession()}
+              />
+              <div className="flex gap-3 mt-6">
+                <button
+                  onClick={() => setCreateModalOpen(false)}
+                  className="flex-1 px-4 py-2 bg-slate-700 hover:bg-slate-600 text-white rounded-lg transition-colors"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={handleCreateSession}
+                  disabled={!newSessionTitle.trim()}
+                  className="flex-1 px-4 py-2 bg-blue-600 hover:bg-blue-700 disabled:bg-blue-800 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                >
+                  Create
+                </button>
+              </div>
             </motion.div>
-          </motion.div>
+          </div>
         )}
       </div>
     </div>

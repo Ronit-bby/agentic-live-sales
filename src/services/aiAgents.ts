@@ -1,47 +1,69 @@
 import { AgentType, ProvenanceEnvelope } from '../types';
 import { v4 as uuidv4 } from 'uuid';
 import { openAIService } from './openai';
+import { AGENTIC_AGENT_TYPES } from './agentTypes';
+import { orchestrator } from './orchestrator';
+import { eventBus } from './eventBus';
+import { LoggerAuditAgent } from './agents/loggerAuditAgent';
+import { STTAgent } from './agents/sttAgent';
+import { EntityExtractionAgent } from './agents/entityExtractionAgent';
+import { DomainIntelligenceAgent } from './agents/domainIntelligenceAgent';
 
-export const AGENT_TYPES: AgentType[] = [
+// Legacy agent types for backward compatibility
+export const LEGACY_AGENT_TYPES: AgentType[] = [
   {
     id: 'sales',
     name: 'Sales Insights',
     description: 'Identifies sales opportunities, pain points, and buying signals',
     color: 'from-green-400 to-emerald-600',
-    icon: '💰'
+    icon: '💰',
+    category: 'analysis',
+    priority: 3
   },
   {
     id: 'hr',
     name: 'HR Analysis',
     description: 'Analyzes team dynamics, communication patterns, and performance',
     color: 'from-blue-400 to-cyan-600',
-    icon: '👥'
+    icon: '👥',
+    category: 'analysis',
+    priority: 4
   },
   {
     id: 'compliance',
     name: 'Compliance Monitor',
     description: 'Flags compliance issues, regulatory concerns, and risk factors',
     color: 'from-red-400 to-rose-600',
-    icon: '🔒'
+    icon: '🔒',
+    category: 'governance',
+    priority: 1
   },
   {
     id: 'competitor',
     name: 'Competitive Intel',
     description: 'Identifies competitor mentions, market positioning, and threats',
     color: 'from-orange-400 to-amber-600',
-    icon: '🎯'
+    icon: '🎯',
+    category: 'intelligence',
+    priority: 3
   },
   {
     id: 'action-items',
     name: 'Action Items',
     description: 'Extracts tasks, deadlines, and follow-up requirements',
     color: 'from-purple-400 to-violet-600',
-    icon: '✅'
+    icon: '✅',
+    category: 'analysis',
+    priority: 2
   }
 ];
 
+// Export both legacy and new agent types
+export const AGENT_TYPES = [...LEGACY_AGENT_TYPES, ...AGENTIC_AGENT_TYPES];
+
+// Legacy AI Agent class for backward compatibility
 class AIAgent {
-  private systemPrompts = {
+  private systemPrompts: Record<string, string> = {
     sales: `You are a Sales Intelligence Agent. Analyze meeting transcripts to identify:
 - Buying signals and purchase intent indicators
 - Pain points and business challenges
@@ -147,7 +169,7 @@ Provide analysis in JSON format with:
     traceId: string, 
     timestamp: Date
   ): Promise<ProvenanceEnvelope> {
-    const systemPrompt = this.systemPrompts[this.agentType.id];
+    const systemPrompt = this.systemPrompts[this.agentType.id] || this.systemPrompts['sales'];
     const userPrompt = `Context: ${context}\n\nTranscript Segment to Analyze:\n${transcriptSegment}\n\nProvide your analysis focusing on ${this.agentType.description}.`;
 
     try {
@@ -291,72 +313,146 @@ Provide analysis in JSON format with:
       ]
     };
 
-    return chains[this.agentType.id] || ["Analyzing transcript for relevant insights"];
+    return (chains as Record<string, string[]>)[this.agentType.id] || ["Analyzing transcript for relevant insights"];
   }
 
   private generateAnalysis(transcript: string): string {
+    const words = transcript.toLowerCase();
+    
     const analyses = {
-      sales: this.generateSalesAnalysis(transcript),
-      hr: this.generateHRAnalysis(transcript),
-      compliance: this.generateComplianceAnalysis(transcript),
-      competitor: this.generateCompetitorAnalysis(transcript),
-      'action-items': this.generateActionItemsAnalysis(transcript)
+      sales: this.generateSalesAnalysis(words),
+      hr: this.generateHRAnalysis(words),
+      compliance: this.generateComplianceAnalysis(words),
+      competitor: this.generateCompetitorAnalysis(words),
+      'action-items': this.generateActionItemsAnalysis(words)
     };
 
-    return analyses[this.agentType.id] || "Analysis generated based on transcript content";
+    return (analyses as Record<string, string>)[this.agentType.id] || "Real-time analysis of conversation content and context.";
   }
 
   private generateInsights(transcript: string): string[] {
+    const words = transcript.toLowerCase();
+    
     const baseInsights = {
-      sales: [
-        "Strong buying signals detected in customer responses",
-        "Price sensitivity appears moderate to low",
-        "Decision timeline estimated at 2-3 weeks"
-      ],
-      hr: [
-        "Team collaboration appears effective",
-        "Communication style is direct and solution-focused",
-        "Leadership engagement is high"
-      ],
-      compliance: [
-        "No immediate compliance red flags detected",
-        "Data handling practices align with regulations",
-        "Documentation requirements being met"
-      ],
-      competitor: [
-        "Two competitor mentions identified",
-        "Market position appears strong",
-        "Differentiation opportunities in feature set"
-      ],
-      'action-items': [
-        "3 high-priority tasks identified",
-        "2 follow-up meetings required",
-        "Documentation needs updating"
-      ]
+      sales: this.generateSalesInsights(words),
+      hr: this.generateHRInsights(words),
+      compliance: this.generateComplianceInsights(words),
+      competitor: this.generateCompetitorInsights(words),
+      'action-items': this.generateActionItemsInsights(words)
     };
 
-    return baseInsights[this.agentType.id] || ["Insights generated from transcript analysis"];
+    return (baseInsights as Record<string, string[]>)[this.agentType.id] || ["Real-time insights generated from conversation analysis"];
   }
 
-  private generateSalesAnalysis(transcript: string): string {
-    return "Customer shows strong interest in the solution. Budget discussions indicate financial capacity. Decision-making authority appears to be present in the meeting. Timeline for implementation aligns with our capabilities.";
+  private generateSalesInsights(words: string): string[] {
+    const insights = [];
+    if (words.includes('budget') || words.includes('cost')) insights.push("💰 Budget authority confirmed - high conversion probability");
+    if (words.includes('timeline') || words.includes('urgent')) insights.push("⏰ Urgency detected - accelerate sales process");
+    if (words.includes('decision') || words.includes('approve')) insights.push("✅ Decision maker engaged - present proposal");
+    if (words.includes('competitor') || words.includes('alternative')) insights.push("⚡ Competitive situation - emphasize differentiators");
+    return insights.length > 0 ? insights : ["🎯 Monitoring for buying signals and engagement patterns", "📊 Customer interest level: Medium to High", "💼 Sales opportunity in progress"];
   }
 
-  private generateHRAnalysis(transcript: string): string {
-    return "Team dynamics appear healthy with good participation from all members. Communication styles are complementary. Leadership is providing clear direction while encouraging input from team members.";
+  private generateHRInsights(words: string): string[] {
+    const insights = [];
+    if (words.includes('team') || words.includes('collaboration')) insights.push("👥 Strong team collaboration detected");
+    if (words.includes('stress') || words.includes('pressure')) insights.push("⚠️ Potential stress indicators - monitor team wellness");
+    if (words.includes('performance') || words.includes('achievement')) insights.push("🏆 Performance-focused discussion - positive engagement");
+    if (words.includes('leadership') || words.includes('manager')) insights.push("👨‍💼 Leadership dynamics being discussed");
+    return insights.length > 0 ? insights : ["📈 Team communication appears effective", "🤝 Collaborative environment detected", "💪 Healthy team dynamics observed"];
   }
 
-  private generateComplianceAnalysis(transcript: string): string {
-    return "No compliance violations detected in the discussion. Data handling practices mentioned are appropriate. Security protocols being followed according to industry standards.";
+  private generateComplianceInsights(words: string): string[] {
+    const insights = [];
+    if (words.includes('data') || words.includes('privacy')) insights.push("🔒 Data privacy discussion - ensure GDPR compliance");
+    if (words.includes('security') || words.includes('protection')) insights.push("🛡️ Security protocols being discussed");
+    if (words.includes('audit') || words.includes('compliance')) insights.push("📋 Audit requirements mentioned - document decisions");
+    if (words.includes('legal') || words.includes('contract')) insights.push("⚖️ Legal considerations in discussion");
+    return insights.length > 0 ? insights : ["✅ No immediate compliance red flags detected", "📝 Documentation practices appear adequate", "🔍 Continuous monitoring active"];
   }
 
-  private generateCompetitorAnalysis(transcript: string): string {
-    return "Competitor mentions suggest awareness of market alternatives. Our positioning appears strong relative to mentioned competitors. Opportunity exists to highlight unique differentiators.";
+  private generateCompetitorInsights(words: string): string[] {
+    const insights = [];
+    if (words.includes('competitor') || words.includes('alternative')) insights.push("🏁 Active competitive evaluation detected");
+    if (words.includes('better') || words.includes('compare')) insights.push("📊 Comparative analysis in progress");
+    if (words.includes('market') || words.includes('industry')) insights.push("🌐 Market positioning discussion active");
+    if (words.includes('price') || words.includes('cost')) insights.push("💲 Price sensitivity being evaluated");
+    return insights.length > 0 ? insights : ["🎯 Market position appears strong", "🔍 Monitoring for competitive threats", "💪 Differentiation opportunities identified"];
   }
 
-  private generateActionItemsAnalysis(transcript: string): string {
-    return "Multiple action items identified with clear ownership and timelines. Follow-up meetings scheduled appropriately. Documentation and deliverables clearly defined.";
+  private generateActionItemsInsights(words: string): string[] {
+    const insights = [];
+    if (words.includes('follow up') || words.includes('next step')) insights.push("📅 Clear follow-up actions identified");
+    if (words.includes('schedule') || words.includes('meeting')) insights.push("🕐 Meeting coordination in progress");
+    if (words.includes('task') || words.includes('responsibility')) insights.push("👤 Task ownership being assigned");
+    if (words.includes('deadline') || words.includes('timeline')) insights.push("⏰ Deadlines and timelines being set");
+    return insights.length > 0 ? insights : ["📋 3 actionable items identified", "👥 Task ownership clearly defined", "🎯 Next steps prioritized"];
   }
+
+  private generateSalesAnalysis(words: string): string {
+    if (words.includes('budget') || words.includes('cost') || words.includes('price')) {
+      return "Strong budget discussion indicates qualified opportunity. Customer is evaluating pricing options and appears to have financial capacity. Recommend presenting value proposition and ROI metrics.";
+    }
+    if (words.includes('timeline') || words.includes('when') || words.includes('schedule')) {
+      return "Customer expressing urgency about implementation timeline. This suggests active buying intent. Recommend accelerating sales process and providing clear implementation roadmap.";
+    }
+    if (words.includes('decision') || words.includes('approve') || words.includes('manager')) {
+      return "Decision-making authority and approval process being discussed. Multiple stakeholders involved. Consider identifying all decision makers and their specific concerns.";
+    }
+    return "Analyzing conversation for sales opportunities, buying signals, and customer engagement patterns. Monitor for budget discussions, timeline requirements, and decision-making authority.";
+  };
+
+  private generateHRAnalysis(words: string): string {
+    if (words.includes('team') || words.includes('collaboration') || words.includes('together')) {
+      return "Strong team collaboration signals detected. Communication patterns show healthy group dynamics with balanced participation. Team appears well-coordinated and focused on collective goals.";
+    }
+    if (words.includes('stress') || words.includes('pressure') || words.includes('difficult')) {
+      return "Potential stress indicators in team communication. Monitor for burnout signs and workload distribution issues. Consider implementing wellness check-ins and workload balancing strategies.";
+    }
+    if (words.includes('performance') || words.includes('goals') || words.includes('achievement')) {
+      return "Performance-focused discussion indicates goal-oriented team culture. Team members are engaged with objectives and tracking progress. Positive indicators for productivity and achievement.";
+    }
+    return "Monitoring team dynamics, communication effectiveness, and collaboration patterns. Assessing leadership styles, conflict resolution, and overall team health indicators.";
+  };
+
+  private generateComplianceAnalysis(words: string): string {
+    if (words.includes('data') || words.includes('privacy') || words.includes('security')) {
+      return "Data privacy and security topics being discussed. Ensure all data handling practices comply with GDPR, CCPA, and industry regulations. Review data processing agreements and security protocols.";
+    }
+    if (words.includes('contract') || words.includes('legal') || words.includes('agreement')) {
+      return "Legal and contractual discussions detected. Review all agreements for compliance with current regulations. Ensure proper documentation and approval processes are followed.";
+    }
+    if (words.includes('audit') || words.includes('compliance') || words.includes('regulation')) {
+      return "Direct compliance discussion in progress. All mentioned procedures should align with current regulatory requirements. Document decisions for audit trail purposes.";
+    }
+    return "Continuously monitoring conversation for compliance triggers, regulatory keywords, and potential risk factors. No immediate compliance concerns detected in current discussion.";
+  };
+
+  private generateCompetitorAnalysis(words: string): string {
+    if (words.includes('competitor') || words.includes('alternative') || words.includes('other option')) {
+      return "Direct competitor discussion detected. Customer is actively evaluating alternatives. Opportunity to highlight unique differentiators and competitive advantages.";
+    }
+    if (words.includes('better') || words.includes('worse') || words.includes('compare')) {
+      return "Comparative analysis being conducted. Customer weighing different options and features. Present clear value proposition and unique selling points to maintain competitive edge.";
+    }
+    if (words.includes('market') || words.includes('industry') || words.includes('standard')) {
+      return "Market and industry context being discussed. Customer has awareness of market landscape. Position solution as industry leader with proven track record and innovation.";
+    }
+    return "Analyzing conversation for competitor mentions, market positioning discussions, and competitive threats. Monitoring for opportunities to strengthen competitive positioning.";
+  };
+
+  private generateActionItemsAnalysis(words: string): string {
+    if (words.includes('follow up') || words.includes('next step') || words.includes('action')) {
+      return "Clear action items and follow-up tasks identified. Multiple stakeholders have committed to specific deliverables with defined timelines. Strong momentum for project progression.";
+    }
+    if (words.includes('schedule') || words.includes('meeting') || words.includes('call')) {
+      return "Scheduling and meeting coordination in progress. Team is actively planning next steps and organizing follow-up sessions. Good project management and communication flow.";
+    }
+    if (words.includes('task') || words.includes('responsibility') || words.includes('owner')) {
+      return "Task assignment and ownership being clarified. Clear delegation of responsibilities with identified task owners. Effective project management and accountability structures.";
+    }
+    return "Extracting actionable items, task assignments, and follow-up requirements from conversation. Monitoring for deadlines, deliverables, and responsibility assignments.";
+  };
 
   // New method for streaming analysis
   async streamAnalysis(
@@ -368,7 +464,7 @@ Provide analysis in JSON format with:
     const timestamp = new Date();
 
     if (openAIService.isReady()) {
-      const systemPrompt = this.systemPrompts[this.agentType.id];
+      const systemPrompt = this.systemPrompts[this.agentType.id] || this.systemPrompts['sales'];
       const userPrompt = `Context: ${context}\n\nTranscript Segment to Analyze:\n${transcriptSegment}\n\nProvide your analysis focusing on ${this.agentType.description}.`;
 
       try {
@@ -413,10 +509,12 @@ Provide analysis in JSON format with:
       const analysisText = mockAnalysis.outputs.analysis;
       
       // Simulate streaming by sending chunks
-      for (let i = 0; i < analysisText.length; i += 10) {
-        const chunk = analysisText.substring(i, i + 10);
-        onChunk(chunk);
-        await new Promise(resolve => setTimeout(resolve, 50));
+      if (analysisText) {
+        for (let i = 0; i < analysisText.length; i += 10) {
+          const chunk = analysisText.substring(i, i + 10);
+          onChunk(chunk);
+          await new Promise(resolve => setTimeout(resolve, 50));
+        }
       }
       
       return mockAnalysis;
@@ -424,9 +522,191 @@ Provide analysis in JSON format with:
   }
 }
 
+// Agentic System Manager
+export class AgenticSystemManager {
+  private logger: LoggerAuditAgent;
+  private sttAgent: STTAgent;
+  private entityExtractionAgent: EntityExtractionAgent;
+  private domainIntelligenceAgent: DomainIntelligenceAgent;
+  private legacyAgents: Map<string, AIAgent>;
+  private isInitialized = false;
+
+  constructor() {
+    this.logger = new LoggerAuditAgent();
+    this.sttAgent = new STTAgent(eventBus, this.logger);
+    this.entityExtractionAgent = new EntityExtractionAgent(eventBus, this.logger);
+    this.domainIntelligenceAgent = new DomainIntelligenceAgent(eventBus, this.logger);
+    
+    // Create legacy agents for backward compatibility
+    this.legacyAgents = new Map();
+    LEGACY_AGENT_TYPES.forEach(agentType => {
+      this.legacyAgents.set(agentType.id, new AIAgent(agentType));
+    });
+  }
+
+  async initialize(): Promise<void> {
+    if (this.isInitialized) return;
+    
+    try {
+      // Initialize orchestrator
+      console.log('Initializing Agentic System...');
+      
+      // Setup event listeners for legacy agent integration
+      this.setupLegacyAgentIntegration();
+      
+      this.isInitialized = true;
+      console.log('Agentic System initialized successfully');
+      
+    } catch (error) {
+      console.error('Failed to initialize Agentic System:', error);
+      throw error;
+    }
+  }
+
+  private setupLegacyAgentIntegration(): void {
+    // Bridge legacy agents with new agentic system
+    eventBus.subscribe('utterance.detected', 'legacy-bridge', async (event) => {
+      const { segment } = event.data;
+      
+      // Run legacy agents in parallel with new system
+      const promises = Array.from(this.legacyAgents.values()).map(agent => 
+        agent.analyze(segment.text, JSON.stringify(event.data.context))
+      );
+      
+      try {
+        const results = await Promise.allSettled(promises);
+        
+        results.forEach((result, index) => {
+          if (result.status === 'fulfilled') {
+            const agentType = LEGACY_AGENT_TYPES[index];
+            
+            // Emit legacy agent result as part of agentic system
+            eventBus.publish({
+              type: 'legacy.agent.completed',
+              data: {
+                agent_type: agentType.id,
+                result: result.value,
+                session_id: event.data.session_id
+              },
+              timestamp: new Date(),
+              source: 'legacy-bridge',
+              trace_id: event.trace_id
+            });
+          }
+        });
+      } catch (error) {
+        console.error('Legacy agent integration error:', error);
+      }
+    });
+  }
+
+  async startSession(sessionId: string, participants: string[] = []): Promise<void> {
+    await this.initialize();
+    await orchestrator.startSession(sessionId, participants);
+  }
+
+  async stopSession(): Promise<void> {
+    await orchestrator.stopSession();
+    await this.sttAgent.stopTranscription();
+  }
+
+  async startTranscription(sessionId: string): Promise<void> {
+    await this.sttAgent.startTranscription(sessionId);
+  }
+
+  async stopTranscription(): Promise<void> {
+    await this.sttAgent.stopTranscription();
+  }
+
+  async processUtterance(transcript: string, speaker: string = 'unknown'): Promise<void> {
+    await orchestrator.processUtterance(transcript, speaker);
+  }
+
+  // Legacy method for backward compatibility
+  async analyzeLegacy(agentId: string, transcript: string, context: string): Promise<ProvenanceEnvelope | null> {
+    const agent = this.legacyAgents.get(agentId);
+    if (!agent) {
+      console.warn(`Legacy agent ${agentId} not found`);
+      return null;
+    }
+    
+    return await agent.analyze(transcript, context);
+  }
+
+  // Legacy streaming method
+  async streamAnalysisLegacy(
+    agentId: string,
+    transcript: string,
+    context: string,
+    onChunk: (chunk: string) => void
+  ): Promise<ProvenanceEnvelope | null> {
+    const agent = this.legacyAgents.get(agentId);
+    if (!agent) {
+      console.warn(`Legacy agent ${agentId} not found`);
+      return null;
+    }
+    
+    return await agent.streamAnalysis(transcript, context, onChunk);
+  }
+
+  getOrchestrator() {
+    return orchestrator;
+  }
+
+  getEventBus() {
+    return eventBus;
+  }
+
+  getLogger() {
+    return this.logger;
+  }
+
+  getSTTAgent() {
+    return this.sttAgent;
+  }
+
+  getEntityExtractionAgent() {
+    return this.entityExtractionAgent;
+  }
+
+  getDomainIntelligenceAgent() {
+    return this.domainIntelligenceAgent;
+  }
+
+  getLegacyAgents() {
+    return this.legacyAgents;
+  }
+
+  getSystemHealth() {
+    return {
+      orchestrator: {
+        active_tasks: orchestrator.getActiveTasks().length,
+        agent_health: Object.fromEntries(orchestrator.getAgentHealth()),
+        conversation_state: orchestrator.getConversationState()
+      },
+      event_bus: eventBus.getHealthStatus(),
+      logger: this.logger.getSystemHealth(),
+      stt: this.sttAgent.getStats(),
+      entity_extraction: this.entityExtractionAgent.getStats(),
+      domain_intelligence: this.domainIntelligenceAgent.getStats()
+    };
+  }
+
+  async shutdown(): Promise<void> {
+    await this.stopSession();
+    this.entityExtractionAgent.shutdown();
+    this.domainIntelligenceAgent.shutdown();
+    this.isInitialized = false;
+  }
+}
+
+// Singleton instance
+export const agenticSystem = new AgenticSystemManager();
+
+// Legacy function for backward compatibility
 export const createAIAgents = (): Map<string, AIAgent> => {
   const agents = new Map();
-  AGENT_TYPES.forEach(agentType => {
+  LEGACY_AGENT_TYPES.forEach(agentType => {
     agents.set(agentType.id, new AIAgent(agentType));
   });
   return agents;

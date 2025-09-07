@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { ErrorBoundary } from './components/ErrorBoundary';
 import { Landing } from './pages/Landing';
 import { Dashboard } from './pages/Dashboard';
 import { Meeting } from './pages/Meeting';
@@ -31,22 +32,34 @@ function App() {
   // Show different views based on state
   switch (currentState) {
     case 'landing':
-      return <Landing onGetStarted={handleGetStarted} />;
+      return (
+        <ErrorBoundary>
+          <Landing onGetStarted={handleGetStarted} />
+        </ErrorBoundary>
+      );
     
     case 'meeting':
       return currentSessionId ? (
-        <Meeting 
-          sessionId={currentSessionId}
-          onBack={handleBackToDashboard}
-          onBackToLanding={handleBackToLanding}
-        />
+        <ErrorBoundary>
+          <Meeting 
+            sessionId={currentSessionId}
+            onBack={handleBackToDashboard}
+            onBackToLanding={handleBackToLanding}
+          />
+        </ErrorBoundary>
       ) : (
-        <Dashboard onStartMeeting={handleStartMeeting} />
+        <ErrorBoundary>
+          <Dashboard onStartMeeting={handleStartMeeting} />
+        </ErrorBoundary>
       );
     
     case 'dashboard':
     default:
-      return <Dashboard onStartMeeting={handleStartMeeting} />;
+      return (
+        <ErrorBoundary>
+          <Dashboard onStartMeeting={handleStartMeeting} />
+        </ErrorBoundary>
+      );
   }
 }
 

@@ -122,7 +122,7 @@ export const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
               Production-Ready Features
             </motion.h3>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-8">
               {features.map((feature, index) => (
                 <motion.div
                   key={feature.title}
@@ -158,7 +158,7 @@ export const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
               Meet Your AI Team
             </motion.h3>
             
-            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
               {agents.map((agent, index) => (
                 <motion.div
                   key={agent.name}
@@ -187,7 +187,7 @@ export const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
         <section className="px-6 py-20">
           <div className="max-w-4xl mx-auto">
             <GlassCard className="p-8">
-              <div className="grid md:grid-cols-3 gap-8 text-center">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-8 text-center">
                 <motion.div
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}

@@ -6,13 +6,23 @@ class OpenAIService {
   private isEnabled: boolean;
 
   constructor() {
-    this.isEnabled = import.meta.env.VITE_ENABLE_REAL_AI === 'true';
+    // Check if OpenAI API key is available
+    const apiKey = import.meta.env.VITE_OPENAI_API_KEY;
+    this.isEnabled = Boolean(apiKey);
     
-    if (this.isEnabled && import.meta.env.VITE_OPENAI_API_KEY) {
+    if (this.isEnabled && apiKey) {
       this.client = new OpenAI({
-        apiKey: import.meta.env.VITE_OPENAI_API_KEY,
+        apiKey: apiKey,
         dangerouslyAllowBrowser: true // Only for demo - use backend in production
       });
+      
+      if (process.env.NODE_ENV === 'development') {
+        console.log('OpenAI service initialized successfully');
+      }
+    } else {
+      if (process.env.NODE_ENV === 'development') {
+        console.log('OpenAI service disabled - using mock responses');
+      }
     }
   }
 
