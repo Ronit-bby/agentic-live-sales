@@ -4,7 +4,6 @@
 
 [![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-Visit%20Now-brightgreen?style=for-the-badge&logo=vercel&logoColor=white)](https://agentic-meeting-studio.web.app/)
 
-<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Robot.png" alt="Robot" width="100" height="100" />
 
 ### *Intelligent Meeting Assistant with Real-time AI Insights*
 
