@@ -54,15 +54,15 @@
 
 ```mermaid
 graph TD
-    A[🎤 Audio Input] --> B[🗣️ STT Agent]
-    B --> C[🤖 Orchestrator]
-    C --> D[🔍 Entity Agent]
-    C --> E[💡 Suggestions Agent]
-    C --> F[📚 RAG Agent]
-    D --> G[📊 Live Insights]
+    A[Audio Input] --> B[STT Agent]
+    B --> C[Orchestrator]
+    C --> D[Entity Agent]
+    C --> E[Suggestions Agent]
+    C --> F[RAG Agent]
+    D --> G[Live Insights]
     E --> G
     F --> G
-    G --> H[✨ Real-time UI]
+    G --> H[Real-time UI Updates]
 
 🛠️ Tech Stack
 <div align="center">
