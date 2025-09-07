@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Plus, Calendar, Clock, Users, Trash2, BarChart3 } from 'lucide-react';
+import { Plus, Calendar, Clock, Users, Trash2 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { MeetingSession } from '../types';
 import { GlassCard } from '../components/Layout/GlassCard';
@@ -109,15 +109,6 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartMeeting }) => {
             </div>
             
             <div className="flex items-center gap-4">
-              <motion.button
-                onClick={() => navigate('/analysis')}
-                className="px-6 py-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-medium rounded-lg flex items-center gap-2 transition-all"
-                whileHover={{ scale: 1.05 }}
-                whileTap={{ scale: 0.95 }}
-              >
-                <BarChart3 className="w-5 h-5" />
-                View Analysis
-              </motion.button>
               <motion.button
                 onClick={() => setCreateModalOpen(true)}
                 className="px-6 py-3 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-lg flex items-center gap-2 transition-all"

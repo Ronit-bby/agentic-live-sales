@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { motion } from 'framer-motion';
-import { ArrowLeft, Users, Clock, BarChart3 } from 'lucide-react';
-import { useNavigate } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { ArrowLeft, Users, Clock, BarChart3, Brain, Lightbulb, FileText, TrendingUp, Download } from 'lucide-react';
+import { useNavigate, useParams } from 'react-router-dom';
 import { WhisperTranscriptionService } from '../services/transcription';
 import { createAIAgents, AGENT_TYPES } from '../services/aiAgents';
 import { firestoreService } from '../services/firestore';
@@ -11,6 +11,7 @@ import { TranscriptPanel } from '../components/Meeting/TranscriptPanel';
 import { AgentPanel } from '../components/Meeting/AgentPanel';
 import { LiveInsightsPanel } from '../components/Meeting/LiveInsightsPanel';
 import { RecordingControls } from '../components/Meeting/RecordingControls';
+import { GlassCard } from '../components/Layout/GlassCard';
 import { useAuth } from '../hooks/useAuth';
 import { useStreamingInsights } from '../hooks/useStreamingInsights';
 
@@ -20,8 +21,10 @@ interface MeetingProps {
   onBackToLanding: () => void;
 }
 
-export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBackToLanding }) => {
+export const Meeting: React.FC<MeetingProps> = ({ onBackToLanding }) => {
   const navigate = useNavigate();
+  const { sessionId: urlSessionId } = useParams<{ sessionId: string }>();
+  const sessionId = urlSessionId || 'default';
   const { user } = useAuth();
   const [session, setSession] = useState<MeetingSession | null>(null);
   const [transcriptEntries, setTranscriptEntries] = useState<TranscriptEntry[]>([]);
@@ -37,6 +40,7 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBackToLanding }) 
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [transcriptionMethod, setTranscriptionMethod] = useState('');
   const [lastProcessingTime, setLastProcessingTime] = useState<Date | null>(null);
+  const [showAnalysis, setShowAnalysis] = useState(false);
 
   // Streaming insights hook
   const {
@@ -394,6 +398,172 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBackToLanding }) 
     return `${minutes}:${secs.toString().padStart(2, '0')}`;
   };
 
+  // Generate analysis data from current meeting data
+  const generateAnalysisData = () => {
+    const keyTopics = agentOutputs
+      .filter(output => output.agentType === 'domain-intelligence')
+      .map(output => output.provenance.outputs.analysis || '')
+      .join(' ')
+      .split(' ')
+      .filter(word => word.length > 3)
+      .slice(0, 6);
+
+    const insights = agentOutputs
+      .filter(output => output.agentType === 'suggestion-generator')
+      .map(output => output.provenance.outputs.analysis || 'No insights yet')
+      .slice(0, 4);
+
+    const actionItems = [
+      'Review meeting transcript for key decisions',
+      'Follow up on discussed action items',
+      'Share insights with relevant stakeholders',
+      'Schedule next meeting if needed'
+    ];
+
+    return {
+      meetingDuration: formatDuration(duration),
+      participantCount: session?.participants.length || 1,
+      keyTopics: keyTopics.length > 0 ? keyTopics : ['Strategy', 'Planning', 'Discussion'],
+      sentimentScore: 0.75,
+      actionItems,
+      insights: insights.length > 0 ? insights : ['Meeting analysis will appear here as the conversation progresses'],
+      transcriptSummary: transcriptEntries.length > 0 
+        ? `Meeting covered ${transcriptEntries.length} discussion points with active participation from ${session?.participants.length || 1} participants.`
+        : 'Start recording to see meeting analysis and insights.',
+      engagementMetrics: {
+        averageSpeakingTime: duration > 0 ? formatDuration(Math.floor(duration / (session?.participants.length || 1))) : '0:00',
+        mostActiveParticipant: session?.participants[0] || 'Unknown',
+        quietPeriods: Math.floor(transcriptEntries.length / 3)
+      }
+    };
+  };
+
+  // Analysis Section Component
+  const AnalysisSection: React.FC<{ analysisData: any }> = ({ analysisData }) => (
+    <GlassCard className="p-6 mb-4">
+      <div className="flex items-center justify-between mb-6">
+        <h2 className="text-xl font-semibold text-white flex items-center gap-2">
+          <Brain className="w-5 h-5" />
+          Live Meeting Analysis
+        </h2>
+        <motion.button
+          className="flex items-center gap-2 px-3 py-1 bg-emerald-600/20 text-emerald-400 rounded-lg text-sm hover:bg-emerald-600/30 transition-colors"
+          whileHover={{ scale: 1.05 }}
+          whileTap={{ scale: 0.95 }}
+        >
+          <Download className="w-4 h-4" />
+          Export
+        </motion.button>
+      </div>
+      
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        {/* Overview Metrics */}
+        <div className="space-y-4">
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+              <Clock className="w-4 h-4" />
+              Meeting Overview
+            </h3>
+            <div className="space-y-3">
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-slate-400">Duration:</span>
+                <span className="text-sm text-white font-medium">{analysisData.meetingDuration}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-slate-400">Participants:</span>
+                <span className="text-sm text-white font-medium">{analysisData.participantCount}</span>
+              </div>
+              <div className="flex justify-between items-center">
+                <span className="text-xs text-slate-400">Sentiment:</span>
+                <div className="flex items-center gap-2">
+                  <div className="w-12 bg-slate-700 rounded-full h-1.5">
+                    <div 
+                      className="bg-emerald-500 h-1.5 rounded-full" 
+                      style={{ width: `${analysisData.sentimentScore * 100}%` }}
+                    />
+                  </div>
+                  <span className="text-xs text-emerald-400 font-medium">
+                    {Math.round(analysisData.sentimentScore * 100)}%
+                  </span>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+              <Users className="w-4 h-4" />
+              Engagement
+            </h3>
+            <div className="space-y-2">
+              <div>
+                <span className="text-xs text-slate-400">Avg Speaking Time</span>
+                <p className="text-sm text-white font-medium">{analysisData.engagementMetrics.averageSpeakingTime}</p>
+              </div>
+              <div>
+                <span className="text-xs text-slate-400">Most Active</span>
+                <p className="text-sm text-white font-medium">{analysisData.engagementMetrics.mostActiveParticipant}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Key Topics & Insights */}
+        <div className="lg:col-span-2 space-y-4">
+          {/* Key Topics */}
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+              <TrendingUp className="w-4 h-4" />
+              Key Topics
+            </h3>
+            <div className="flex flex-wrap gap-2">
+              {analysisData.keyTopics.map((topic: string, index: number) => (
+                <span
+                  key={index}
+                  className="px-2 py-1 bg-blue-600/20 text-blue-300 rounded text-xs border border-blue-500/30"
+                >
+                  {topic}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* AI Insights */}
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+              <Lightbulb className="w-4 h-4" />
+              AI Insights
+            </h3>
+            <div className="space-y-2">
+              {analysisData.insights.slice(0, 3).map((insight: string, index: number) => (
+                <div key={index} className="flex items-start gap-2">
+                  <div className="w-1 h-1 bg-yellow-400 rounded-full mt-2 flex-shrink-0" />
+                  <p className="text-xs text-slate-300 leading-relaxed">{insight}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Action Items */}
+          <div className="bg-slate-800/40 border border-slate-700/50 rounded-lg p-4">
+            <h3 className="text-sm font-medium text-slate-300 mb-3 flex items-center gap-2">
+              <FileText className="w-4 h-4" />
+              Action Items
+            </h3>
+            <div className="space-y-2">
+              {analysisData.actionItems.slice(0, 3).map((item: string, index: number) => (
+                <div key={index} className="flex items-start gap-2">
+                  <div className="w-1 h-1 bg-emerald-400 rounded-full mt-2 flex-shrink-0" />
+                  <p className="text-xs text-slate-300">{item}</p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </GlassCard>
+  );
+
   return (
     <div className="min-h-screen relative overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
       {/* Professional subtle pattern overlay */}
@@ -438,13 +608,17 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBackToLanding }) 
 
             <div className="flex items-center gap-4">
               <motion.button
-                onClick={() => navigate('/analysis')}
-                className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white hover:bg-slate-700/50 rounded-lg transition-all border border-slate-600/50"
+                onClick={() => setShowAnalysis(!showAnalysis)}
+                className={`flex items-center gap-2 px-4 py-2 rounded-lg transition-all border border-slate-600/50 ${
+                  showAnalysis 
+                    ? 'bg-blue-600 text-white hover:bg-blue-700' 
+                    : 'text-slate-300 hover:text-white hover:bg-slate-700/50'
+                }`}
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
               >
                 <BarChart3 className="w-4 h-4" />
-                <span className="font-medium">View Analysis</span>
+                <span className="font-medium">{showAnalysis ? 'Hide Analysis' : 'Show Analysis'}</span>
               </motion.button>
               
               <RecordingControls
@@ -463,6 +637,21 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBackToLanding }) 
             streamingInsights={new Map(insights.map(insight => [insight.id, insight.content]))}
             processingAgents={processingAgents}
           />
+          
+          {/* Analysis Section - Conditionally Shown */}
+          <AnimatePresence>
+            {showAnalysis && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: 'auto' }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.3 }}
+                className="overflow-hidden"
+              >
+                <AnalysisSection analysisData={generateAnalysisData()} />
+              </motion.div>
+            )}
+          </AnimatePresence>
           
           {/* Content Grid */}
           <div className="flex-1 flex flex-col lg:flex-row gap-4 lg:gap-6 min-h-0">
