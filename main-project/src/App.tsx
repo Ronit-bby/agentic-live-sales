@@ -1,15 +1,14 @@
 import React, { useState, useEffect } from 'react';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
 import { Landing } from './pages/Landing';
 import { Dashboard } from './pages/Dashboard';
 import { Meeting } from './pages/Meeting';
+import Analysis from './pages/Analysis';
 import { analytics } from './lib/firebase';
 import { logEvent } from 'firebase/analytics';
 
-type AppState = 'landing' | 'dashboard' | 'meeting';
-
 function App() {
-  const [currentState, setCurrentState] = useState<AppState>('landing');
   const [currentSessionId, setCurrentSessionId] = useState<string | null>(null);
 
   // Track app initialization
@@ -23,7 +22,6 @@ function App() {
     if (analytics) {
       logEvent(analytics, 'get_started_clicked');
     }
-    setCurrentState('dashboard');
   };
 
   const handleStartMeeting = (sessionId: string) => {
@@ -31,14 +29,12 @@ function App() {
       logEvent(analytics, 'meeting_started', { session_id: sessionId });
     }
     setCurrentSessionId(sessionId);
-    setCurrentState('meeting');
   };
 
   const handleBackToDashboard = () => {
     if (analytics) {
       logEvent(analytics, 'back_to_dashboard');
     }
-    setCurrentState('dashboard');
     setCurrentSessionId(null);
   };
 
@@ -46,42 +42,43 @@ function App() {
     if (analytics) {
       logEvent(analytics, 'back_to_landing');
     }
-    setCurrentState('landing');
     setCurrentSessionId(null);
   };
 
-  // Show different views based on state
-  switch (currentState) {
-    case 'landing':
-      return (
-        <ErrorBoundary>
-          <Landing onGetStarted={handleGetStarted} />
-        </ErrorBoundary>
-      );
-    
-    case 'meeting':
-      return currentSessionId ? (
-        <ErrorBoundary>
-          <Meeting 
-            sessionId={currentSessionId}
-            onBack={handleBackToDashboard}
-            onBackToLanding={handleBackToLanding}
+  return (
+    <Router>
+      <ErrorBoundary>
+        <Routes>
+          <Route 
+            path="/" 
+            element={<Landing onGetStarted={handleGetStarted} />} 
           />
-        </ErrorBoundary>
-      ) : (
-        <ErrorBoundary>
-          <Dashboard onStartMeeting={handleStartMeeting} />
-        </ErrorBoundary>
-      );
-    
-    case 'dashboard':
-    default:
-      return (
-        <ErrorBoundary>
-          <Dashboard onStartMeeting={handleStartMeeting} />
-        </ErrorBoundary>
-      );
-  }
+          <Route 
+            path="/dashboard" 
+            element={<Dashboard onStartMeeting={handleStartMeeting} />} 
+          />
+          <Route 
+            path="/meeting/:sessionId?" 
+            element={
+              <Meeting 
+                sessionId={currentSessionId || 'default'}
+                onBack={handleBackToDashboard}
+                onBackToLanding={handleBackToLanding}
+              />
+            } 
+          />
+          <Route 
+            path="/analysis" 
+            element={<Analysis />} 
+          />
+          <Route 
+            path="*" 
+            element={<Navigate to="/" replace />} 
+          />
+        </Routes>
+      </ErrorBoundary>
+    </Router>
+  );
 }
 
 export default App;

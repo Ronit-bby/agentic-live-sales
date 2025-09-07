@@ -1,6 +1,7 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Brain, Mic, Shield, Zap, ArrowRight, Users, Target, Clock } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
 import { GlassCard } from '../components/Layout/GlassCard';
 import { AnimatedBackground } from '../components/Layout/AnimatedBackground';
 
@@ -9,6 +10,12 @@ interface LandingProps {
 }
 
 export const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
+  const navigate = useNavigate();
+  
+  const handleGetStarted = () => {
+    onGetStarted();
+    navigate('/dashboard');
+  };
   const features = [
     {
       icon: <Brain className="w-8 h-8" />,
@@ -60,7 +67,7 @@ export const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
             </div>
             
             <motion.button
-              onClick={onGetStarted}
+              onClick={handleGetStarted}
               className="px-6 py-2 bg-white/10 hover:bg-white/20 border border-white/20 rounded-lg text-white font-medium transition-all"
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
@@ -97,7 +104,7 @@ export const Landing: React.FC<LandingProps> = ({ onGetStarted }) => {
             </motion.p>
             
             <motion.button
-              onClick={onGetStarted}
+              onClick={handleGetStarted}
               className="px-8 py-4 bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700 text-white font-semibold rounded-xl flex items-center gap-3 mx-auto transition-all"
               initial={{ opacity: 0, scale: 0.9 }}
               animate={{ opacity: 1, scale: 1 }}
