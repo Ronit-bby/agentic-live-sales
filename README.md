@@ -38,7 +38,9 @@
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Architecture (Simplified)
+
+
 
 ```mermaid
 graph TD
