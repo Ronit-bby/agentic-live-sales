@@ -55,17 +55,26 @@ graph TD
     G --> H[Real-time UI Updates]
 
 
-🛠️ Tech Stack
-<div align="center">
-Frontend	Backend	Infra	AI
-⚛️ React 18	🟩 Node.js	🔥 Firebase	🤯 OpenAI GPT
-🎨 Tailwind	🚀 Express	☁️ Hosting	🧠 Custom Agents
-</div>
-🎯 Quick Demo Flow
+
+---
+
+## 🛠️ Tech Stack
+
+| Frontend | Backend | Infra | AI |
+|----------|---------|-------|----|
+| ⚛️ React 18 | 🟩 Node.js | 🔥 Firebase | 🤯 OpenAI GPT |
+| 🎨 Tailwind | 🚀 Express | ☁️ Hosting | 🧠 Custom Agents |
+
+---
+
+## 🎯 Quick Demo Flow
+
+```bash
 1️⃣ Start Meeting → Capture Audio  
 2️⃣ Watch Live Transcription (instant)  
 3️⃣ Get AI Insights + Suggestions in Real-time  
 4️⃣ End Meeting → Auto Summary Generated  
+
 🌟 Why It Stands Out
 <div align="center">
 💎 Built in just 12 hours at IIT Kanpur Hackathon (OOSC Open Source)
