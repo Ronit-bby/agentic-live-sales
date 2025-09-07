@@ -27,26 +27,14 @@
 
 ## 🚀 Key Features
 
-<table>
-<tr>
-<td width="50%">
-
-- 🎤 **Live Speech-to-Text**  
-- 🤖 **AI Multi-Agent System**  
-- 🔍 **Entity Extraction**  
-- 💡 **Smart Recommendations**  
-
-</td>
-<td width="50%">
-
-- 📊 **Meeting Summaries**  
-- ⚡ **Streaming Insights (char-by-char)**  
-- 🔐 **Secure Firebase Auth**  
-- 🎨 **Modern Glassmorphism UI**  
-
-</td>
-</tr>
-</table>
+- 🎤 Live Speech-to-Text  
+- 🤖 Multi-Agent Orchestration  
+- 🔍 Entity Extraction  
+- 💡 Smart Recommendations  
+- 📊 Meeting Summaries  
+- ⚡ Streaming Insights (char-by-char)  
+- 🔐 Secure Firebase Auth  
+- 🎨 Modern Glassmorphism UI  
 
 ---
 
@@ -63,6 +51,7 @@ graph TD
     E --> G
     F --> G
     G --> H[Real-time UI Updates]
+
 
 🛠️ Tech Stack
 <div align="center">
