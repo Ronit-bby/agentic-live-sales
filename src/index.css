@@ -82,3 +82,32 @@ body {
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 }
+
+/* AI Processing Footer Enhancements */
+@keyframes processing-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+.animate-processing {
+  animation: processing-pulse 1.5s ease-in-out infinite;
+}
+
+/* Scrollable agent list */
+.agent-scroll::-webkit-scrollbar {
+  height: 4px;
+}
+
+.agent-scroll::-webkit-scrollbar-track {
+  background: rgba(51, 65, 85, 0.2);
+  border-radius: 2px;
+}
+
+.agent-scroll::-webkit-scrollbar-thumb {
+  background: rgba(71, 85, 105, 0.5);
+  border-radius: 2px;
+}
+
+.agent-scroll::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.7);
+}

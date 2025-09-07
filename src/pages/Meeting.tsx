@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { ArrowLeft, Users, Clock, Settings } from 'lucide-react';
 import { WhisperTranscriptionService } from '../services/transcription';
-import { createAIAgents } from '../services/aiAgents';
+import { createAIAgents, AGENT_TYPES } from '../services/aiAgents';
 import { firestoreService } from '../services/firestore';
 import { openAIService } from '../services/openai';
 import { MeetingSession, TranscriptEntry, AgentOutput } from '../types';
@@ -32,8 +32,10 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBack, onBackToLan
   const [currentTranscript, setCurrentTranscript] = useState('');
   const [interimTranscript, setInterimTranscript] = useState('');
   const [isAIProcessing, setIsAIProcessing] = useState(false);
+  const [processingAgents, setProcessingAgents] = useState<Set<string>>(new Set());
   const [connectionStatus, setConnectionStatus] = useState<'connecting' | 'connected' | 'disconnected'>('connecting');
   const [transcriptionMethod, setTranscriptionMethod] = useState('');
+  const [lastProcessingTime, setLastProcessingTime] = useState<Date | null>(null);
 
   // Firebase unsubscribe functions
   const [unsubscribeTranscripts, setUnsubscribeTranscripts] = useState<(() => void) | null>(null);
@@ -87,7 +89,10 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBack, onBackToLan
       sessionId,
       (outputs) => {
         setAgentOutputs(outputs);
-        setIsAIProcessing(false); // AI processing completed
+        // Only clear processing if we have completed outputs and no agents are processing
+        if (outputs.length > 0 && processingAgents.size === 0) {
+          setIsAIProcessing(false);
+        }
       }
     );
     setUnsubscribeOutputs(() => unsubOutputs);
@@ -199,6 +204,8 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBack, onBackToLan
     if (isAIProcessing) return; // Prevent concurrent processing
     
     setIsAIProcessing(true);
+    setLastProcessingTime(new Date());
+    setProcessingAgents(new Set()); // Clear previous processing agents
     
     // Get recent context from Firebase
     try {
@@ -208,6 +215,9 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBack, onBackToLan
       // Process with each AI agent in parallel for faster results
       const agentPromises = Array.from(aiAgents.entries()).map(async ([agentId, agent]) => {
         try {
+          // Add agent to processing set
+          setProcessingAgents(prev => new Set([...prev, agentId]));
+          
           if (openAIService.isReady()) {
             // Use streaming analysis for real-time updates
             const outputId = await firestoreService.streamAgentOutput(
@@ -256,13 +266,22 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBack, onBackToLan
           }
         } catch (error) {
           console.error(`Error processing with ${agentId} agent:`, error);
+        } finally {
+          // Remove agent from processing set
+          setProcessingAgents(prev => {
+            const newSet = new Set(prev);
+            newSet.delete(agentId);
+            return newSet;
+          });
         }
       });
 
       await Promise.all(agentPromises);
     } catch (error) {
       console.error('Error in AI processing:', error);
+    } finally {
       setIsAIProcessing(false);
+      setProcessingAgents(new Set()); // Clear all processing agents
     }
   };
 
@@ -431,40 +450,103 @@ export const Meeting: React.FC<MeetingProps> = ({ sessionId, onBack, onBackToLan
           </motion.div>
         </div>
 
-        {/* Status Bar */}
+        {/* Enhanced AI Processing Footer */}
         <motion.div
-          className="p-4 border-t border-slate-700/50 bg-slate-900/80 backdrop-blur-sm"
+          className="border-t border-slate-700/50 bg-slate-900/90 backdrop-blur-sm"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
         >
-          <div className="flex items-center justify-between text-sm text-slate-400">
-            <div className="flex items-center gap-6">
-              <span>Transcripts: {transcriptEntries.length}</span>
-              <span>AI Insights: {agentOutputs.length}</span>
-              <span>Agents Active: {aiAgents.size}</span>
-              <span className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${
-                  connectionStatus === 'connected' ? 'bg-emerald-400' :
-                  connectionStatus === 'connecting' ? 'bg-yellow-400' : 'bg-red-400'
-                }`} />
-                Firebase: {connectionStatus}
-              </span>
-              <span>Transcription: {transcriptionMethod}</span>
-            </div>
-            
-            <div className="flex items-center gap-4">
-              {isAIProcessing && (
-                <div className="flex items-center gap-2 text-blue-400">
-                  <div className="w-2 h-2 rounded-full bg-blue-400 animate-pulse" />
-                  <span>AI Processing...</span>
+          {/* Main Status Row */}
+          <div className="p-4 border-b border-slate-800/50">
+            <div className="flex items-center justify-between text-sm text-slate-400">
+              <div className="flex items-center gap-6">
+                <span>Transcripts: {transcriptEntries.length}</span>
+                <span>AI Insights: {agentOutputs.length}</span>
+                <span>Agents Active: {aiAgents.size}</span>
+                <span className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${
+                    connectionStatus === 'connected' ? 'bg-emerald-400' :
+                    connectionStatus === 'connecting' ? 'bg-yellow-400' : 'bg-red-400'
+                  }`} />
+                  Firebase: {connectionStatus}
+                </span>
+                <span>Transcription: {transcriptionMethod}</span>
+              </div>
+              
+              <div className="flex items-center gap-4">
+                <div className="flex items-center gap-2">
+                  <div className={`w-2 h-2 rounded-full ${isRecording ? 'bg-emerald-400' : 'bg-slate-500'}`} />
+                  <span>{isRecording ? 'Live Recording' : 'Stopped'}</span>
                 </div>
-              )}
-              <div className="flex items-center gap-2">
-                <div className={`w-2 h-2 rounded-full ${isRecording ? 'bg-emerald-400' : 'bg-slate-500'}`} />
-                <span>{isRecording ? 'Live' : 'Stopped'}</span>
               </div>
             </div>
+          </div>
+
+          {/* AI Processing Status Row */}
+          <div className="px-4 py-3">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-4">
+                {isAIProcessing ? (
+                  <div className="flex items-center gap-3">
+                    <div className="flex items-center gap-2 text-blue-400">
+                      <div className="w-3 h-3 rounded-full bg-blue-400 animate-pulse" />
+                      <span className="font-medium">AI Processing Active</span>
+                    </div>
+                    {lastProcessingTime && (
+                      <span className="text-xs text-slate-500">
+                        Started: {lastProcessingTime.toLocaleTimeString()}
+                      </span>
+                    )}
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 text-slate-500">
+                    <div className="w-3 h-3 rounded-full bg-slate-500" />
+                    <span>AI Agents Ready</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="flex items-center gap-2">
+                {processingAgents.size > 0 && (
+                  <div className="flex items-center gap-3">
+                    <span className="text-xs text-slate-400">Processing:</span>
+                    <div className="flex items-center gap-2">
+                      {Array.from(processingAgents).map(agentId => {
+                        const agentType = AGENT_TYPES.find(a => a.id === agentId);
+                        return agentType ? (
+                          <div
+                            key={agentId}
+                            className="flex items-center gap-1 px-2 py-1 bg-slate-800/60 rounded-full text-xs border border-slate-700/50"
+                          >
+                            <span className="animate-pulse">{agentType.icon}</span>
+                            <span className="text-slate-300">{agentType.name}</span>
+                            <div className="w-1.5 h-1.5 rounded-full bg-blue-400 animate-bounce" />
+                          </div>
+                        ) : null;
+                      })}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+            
+            {/* Agent Overview */}
+            {!isAIProcessing && processingAgents.size === 0 && (
+              <div className="mt-3 flex items-center gap-3 overflow-x-auto agent-scroll scrollbar-thin">
+                <span className="text-xs text-slate-500 whitespace-nowrap">Available Agents:</span>
+                {AGENT_TYPES.map(agentType => (
+                  <div
+                    key={agentType.id}
+                    className="flex items-center gap-1 px-2 py-1 bg-slate-800/40 rounded-full text-xs border border-slate-700/30 whitespace-nowrap hover:bg-slate-800/60 transition-colors"
+                  >
+                    <span>{agentType.icon}</span>
+                    <span className="text-slate-400">{agentType.name}</span>
+                    <div className="w-1.5 h-1.5 rounded-full bg-emerald-500/60" />
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </motion.div>
       </div>
