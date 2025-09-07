@@ -4,7 +4,7 @@
 
 [![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-Visit%20Now-brightgreen?style=for-the-badge&logo=vercel&logoColor=white)](https://agentic-meeting-studio.web.app/)
 
-<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Robot.png" alt="Robot" width="100" height="100" />
+<img src="https://github.com/github/explore/raw/main/topics/artificial-intelligence/artificial-intelligence.png" alt="AI Logo" width="120" height="120" />
 
 ### *Intelligent Meeting Assistant with Real-time AI Insights*
 
@@ -28,6 +28,9 @@
 
 This project was built at **HIT Kanpur** during a **12-hour hackathon organized by OOSC (Open Source Club)**.  
 Agentic Meeting Studio reimagines online collaboration with **AI-driven intelligence** that transforms meetings into actionable insights — in real time.
+
+... *(rest of your README stays the same as before)* ...
+
 
 <table>
 <tr>
