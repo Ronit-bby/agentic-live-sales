@@ -22,36 +22,43 @@
 
 </div>
 
+---
+
 ## ✨ What Makes It Special
+
+This project was built at **HIT Kanpur** during a **12-hour hackathon organized by OOSC (Open Source Club)**.  
+Agentic Meeting Studio reimagines online collaboration with **AI-driven intelligence** that transforms meetings into actionable insights — in real time.
 
 <table>
 <tr>
 <td width="50%">
 
 ### 🧠 **AI-Powered Intelligence**
-- **Real-time Transcription**: Advanced speech-to-text processing
-- **Multi-Agent Architecture**: Specialized AI agents for different tasks
-- **Live Insights**: Streaming analysis with typewriter effects
-- **Smart Suggestions**: Context-aware recommendations
+- **Real-time Transcription**: Advanced speech-to-text pipeline  
+- **Multi-Agent Collaboration**: Specialized AI agents working in sync  
+- **Live Insights**: Continuous streaming analysis with smooth delivery  
+- **Smart Suggestions**: Context-aware, dynamic recommendations  
 
 </td>
 <td width="50%">
 
 ### 🎯 **Key Features**
-- **Domain Intelligence**: Industry-specific knowledge
-- **Entity Extraction**: Automatic identification of key elements
-- **Person Enrichment**: Enhanced participant profiles
-- **RAG Integration**: Retrieval-Augmented Generation
+- **Domain Intelligence**: Tailored, industry-specific knowledge  
+- **Entity Extraction**: Automatic detection of key terms & participants  
+- **Person Enrichment**: Builds richer participant context  
+- **RAG Integration**: Retrieval-Augmented Generation for precision  
 
 </td>
 </tr>
 </table>
 
+---
+
 ## 🚀 Live Demo
 
 <div align="center">
 
-### 🌟 **Experience the Future of Meetings**
+### 🌟 **Experience the Future of Meetings (Hackathon Prototype)**
 
 <a href="https://agentic-meeting-studio.web.app/" target="_blank">
   <img src="https://user-images.githubusercontent.com/74038190/212284087-bbe7e430-757e-4901-90bf-4cd2ce3e1852.gif" width="50">
@@ -60,6 +67,8 @@
 </a>
 
 </div>
+
+---
 
 ## 🏗️ Architecture Overview
 
@@ -80,171 +89,89 @@ graph TB
     H --> J
     I --> J
     J --> K[✨ Real-time UI Updates]
-```
-
-## 🛠️ Technology Stack
-
+🛠️ Technology Stack
 <div align="center">
-
-| Frontend | Backend | Database | Deployment | AI/ML |
-|:--------:|:-------:|:--------:|:----------:|:-----:|
-| <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" width="40"> | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" width="40"> | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/firebase/firebase-plain.svg" width="40"> | <img src="https://user-images.githubusercontent.com/74038190/238200426-29fd6286-4e7b-4d6c-818f-c4765d5e39a9.gif" width="40"> | <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width="40"> |
-| React 18 | Node.js | Firestore | Firebase | OpenAI GPT |
-| TypeScript | Express | Real-time DB | Hosting | Custom Agents |
-
+Frontend	Backend	Database	Deployment	AI/ML
+<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" width="40">	<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" width="40">	<img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/firebase/firebase-plain.svg" width="40">	<img src="https://user-images.githubusercontent.com/74038190/238200426-29fd6286-4e7b-4d6c-818f-c4765d5e39a9.gif" width="40">	<img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width="40">
+React 18	Node.js	Firestore	Firebase	OpenAI GPT
+TypeScript	Express	Real-time DB	Hosting	Custom Agents
 </div>
-
-## 🎨 Features Showcase
-
-<details>
-<summary>🎭 <strong>Interactive UI Components</strong></summary>
-
-- **Glass Morphism Design**: Modern, translucent interface elements
-- **Animated Backgrounds**: Dynamic particle systems and gradients
-- **Real-time Visualizations**: Live data streaming with smooth animations
-- **Responsive Layout**: Seamless experience across all devices
-
+🎨 Features Showcase
+<details> <summary>🎭 <strong>Interactive UI Components</strong></summary>
+Glass Morphism Design: Modern translucent interfaces
+Animated Backgrounds: Dynamic visuals for engagement
+Real-time Visualizations: Smooth data streaming in the UI
+Responsive Layout: Optimized for all devices
+</details> <details> <summary>🤖 <strong>AI Agent System</strong></summary>
+Speech-to-Text Agent → Accurate live transcription
+Domain Intelligence Agent → Industry-specific analysis
+Entity Extraction Agent → Identify people, places, terms
+Person Enrichment Agent → Enrich participant metadata
+Suggestion Generator Agent → Actionable recommendations
+Retriever RAG Agent → Connects to external knowledge
+Ranking Contextualizer Agent → Prioritizes insights
+</details> <details> <summary>🔥 <strong>Real-time Features</strong></summary>
+Live Transcription: Instant speech-to-text
+Streaming Insights: Character-by-character AI output
+Dynamic Suggestions: Adaptive, context-driven tips
+Real-time Collaboration: Multi-user meeting support
 </details>
-
-<details>
-<summary>🤖 <strong>AI Agent System</strong></summary>
-
-- **Speech-to-Text Agent**: High-accuracy voice recognition
-- **Domain Intelligence Agent**: Industry-specific knowledge processing
-- **Entity Extraction Agent**: Automatic identification of people, places, concepts
-- **Person Enrichment Agent**: Enhanced participant information and context
-- **Suggestion Generator Agent**: Real-time actionable recommendations
-- **Retriever RAG Agent**: Knowledge base integration and retrieval
-- **Ranking Contextualizer Agent**: Priority-based insight organization
-
-</details>
-
-<details>
-<summary>🔥 <strong>Real-time Features</strong></summary>
-
-- **Live Transcription**: Instant speech-to-text conversion
-- **Streaming Insights**: Character-by-character AI analysis
-- **Dynamic Suggestions**: Context-aware recommendations
-- **Real-time Collaboration**: Multi-user meeting support
-
-</details>
-
-## 📁 Project Structure
-
-```
+📁 Project Structure
 agentic-live-sales/
-├── README.md                    # Project documentation
-├── main-project/               # Main application code
-│   ├── src/                    # Source code
-│   │   ├── components/         # React components
-│   │   ├── services/           # AI agents and services
-│   │   ├── hooks/              # Custom React hooks
-│   │   ├── lib/                # Utility libraries
-│   │   ├── pages/              # Page components
-│   │   └── types/              # TypeScript type definitions
-│   ├── dist/                   # Build output
-│   ├── firebase.json           # Firebase configuration
-│   ├── package.json            # Dependencies and scripts
-│   └── vite.config.ts          # Vite configuration
-└── .git/                       # Git repository
-```
-
-
-
-### Prerequisites
-
-<img src="https://user-images.githubusercontent.com/74038190/212257454-16e3712e-945a-4ca2-b238-408ad0bf87e6.gif" width="20"> **Node.js** (v18 or higher)  
-<img src="https://user-images.githubusercontent.com/74038190/212257472-08e52665-c503-4bd9-aa20-f5a4dae769b5.gif" width="20"> **Firebase Account**  
-<img src="https://user-images.githubusercontent.com/74038190/212257468-1e9a91f1-b626-4baa-b15d-5c385b7ccf23.gif" width="20"> **OpenAI API Key**
-
-### Installation
-
-```bash
-# Clone the repository
-git clone https://github.com/Ronit-bby/agentic-live-sales.git
-
-# Navigate to project directory
-cd agentic-live-sales
-
-# Navigate to main project folder
-cd main-project
-
-# Install dependencies
-npm install
-
-# Set up environment variables
-cp .env.example .env.local
-# Add your Firebase and OpenAI configurations
-
-# Start development server
-npm run dev
-```
-
+├── README.md                    # Documentation (Hackathon Edition)
+├── main-project/                # Core app
+│   ├── src/                     # Source code
+│   │   ├── components/          # React components
+│   │   ├── services/            # AI agents & integrations
+│   │   ├── hooks/               # Custom React hooks
+│   │   ├── lib/                 # Utilities
+│   │   ├── pages/               # Pages
+│   │   └── types/               # TypeScript types
+│   ├── dist/                    # Build output
+│   ├── firebase.json            # Firebase setup
+│   ├── package.json             # Dependencies
+│   └── vite.config.ts           # Vite configuration
+└── .git/                        # Git repo
+🎯 Usage
+🎤 Start Recording → Begin capturing meeting audio
+👀 Watch Live Transcription → Real-time speech-to-text
+🧠 View AI Insights → Intelligent analysis streamed live
+💡 Get Suggestions → Context-aware recommendations
+📊 Review Analytics → Full meeting summaries and insights
+🌟 Key Highlights
 <div align="center">
-<img src="https://user-images.githubusercontent.com/74038190/212284158-e840e285-664b-44d7-b79b-e264b5e54825.gif" width="400">
+Feature	Description	Status
+🎯 Real-time Processing	Live transcription & analysis	✅ Active
+🤖 Multi-Agent AI	Specialized AI agents	✅ Active
+🔄 Streaming Insights	Character-by-character AI	✅ Active
+🎨 Modern UI/UX	Glass morphism, smooth animations	✅ Active
+🔐 Secure Authentication	Firebase user auth	✅ Active
+📱 Responsive Design	Cross-platform compatibility	✅ Active
 </div>
-
-## 🎯 Usage
-
-1. **🎤 Start Recording**: Click the record button to begin capturing audio
-2. **👀 Watch Live Transcription**: See real-time speech-to-text conversion
-3. **🧠 View AI Insights**: Monitor intelligent analysis as it streams in
-4. **💡 Get Suggestions**: Receive contextual recommendations during the meeting
-5. **📊 Review Analytics**: Access comprehensive meeting insights and summaries
-
-## 🌟 Key Highlights
-
+🤝 Contributing
+<img src="https://user-images.githubusercontent.com/74038190/212284087-bbe7e430-757e-4901-90bf-4cd2ce3e1852.gif" width="30"> **We welcome contributions!** This was built in a **12-hour hackathon at HIT Kanpur organized by OOSC Open Source**, but it’s designed to evolve. Contributions, ideas, and improvements are always appreciated.
+Fork the repo
+Create your feature branch (git checkout -b feature/AmazingFeature)
+Commit changes (git commit -m 'Add AmazingFeature')
+Push (git push origin feature/AmazingFeature)
+Open a PR
+📄 License
+This project is licensed under the MIT License - see the LICENSE file.
+👨‍💻 Author
 <div align="center">
+Ronit
 
-| Feature | Description | Status |
-|---------|-------------|--------|
-| 🎯 **Real-time Processing** | Live audio transcription and analysis | ✅ Active |
-| 🤖 **Multi-Agent AI** | Specialized agents for different tasks | ✅ Active |
-| 🔄 **Streaming Insights** | Character-by-character AI responses | ✅ Active |
-| 🎨 **Modern UI/UX** | Glass morphism and smooth animations | ✅ Active |
-| 🔐 **Secure Authentication** | Firebase-based user management | ✅ Active |
-| 📱 **Responsive Design** | Cross-platform compatibility | ✅ Active |
+
 
 </div>
-
-## 🤝 Contributing
-
-<img src="https://user-images.githubusercontent.com/74038190/212284087-bbe7e430-757e-4901-90bf-4cd2ce3e1852.gif" width="30"> **We welcome contributions!**
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
+🙏 Acknowledgments
+OOSC Open Source for organizing the hackathon at HIT Kanpur
+Hackathon Mentors & Judges for valuable guidance
+OpenAI for enabling powerful AI features
+Firebase for robust infrastructure
+React & Tailwind CSS for rapid, beautiful UI development
 <div align="center">
-
-**Ronit** 
-
-[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ronit-bby)
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/ronit-bby)
-
-</div>
-
-## 🙏 Acknowledgments
-
-- **OpenAI** for providing powerful AI capabilities
-- **Firebase** for robust backend infrastructure
-- **React** community for amazing components and tools
-- **Tailwind CSS** for beautiful styling utilities
-
-<div align="center">
-
-### 🌟 **Star this repository if you found it helpful!** 🌟
-
+🌟 If you like this project, give it a star! 🌟
 <img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="900">
-
-**Made with ❤️ and lots of ☕**
-
-</div>
+Built with ❤️ at a 12-hour Hackathon (HIT Kanpur, OOSC Open Source) — turning coffee into code ☕
+</div> ```
