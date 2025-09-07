@@ -1,195 +1,227 @@
-# agentic-live-sales
->>>>>>> f3aba79c0423dbb43c9488197f3d886eb2257146
-# Agentic Live Sales
+# 🤖 Agentic Meeting Studio
 
-A production-ready meeting intelligence platform powered by AI agents, real-time transcription, and complete provenance tracking.
+<div align="center">
 
-## Features
+[![Live Demo](https://img.shields.io/badge/🚀%20Live%20Demo-Visit%20Now-brightgreen?style=for-the-badge&logo=vercel&logoColor=white)](https://agentic-meeting-studio.web.app/)
 
-### 🤖 AI-Powered Analysis
-- **5 Specialized AI Agents**: Sales, HR, Compliance, Competitor Analysis, and Action Items
-- **Real-time Processing**: Live analysis of meeting transcriptions
-- **Complete Provenance**: Full traceability of AI decisions with expandable reasoning chains
+<img src="https://raw.githubusercontent.com/Tarikul-Islam-Anik/Animated-Fluent-Emojis/master/Emojis/Objects/Robot.png" alt="Robot" width="100" height="100" />
 
-### 🎤 Live Transcription
-- **OpenAI Whisper Integration**: High-accuracy speech-to-text
-- **Real-time Updates**: Instant transcription display
-- **Multi-speaker Support**: Automatic speaker identification
+### *Intelligent Meeting Assistant with Real-time AI Insights*
 
-### 🔒 Secure & Scalable
-- **Firebase Authentication**: JWT-based secure login
-- **Firestore Database**: Real-time data synchronization
-- **Production Ready**: Modular, maintainable codebase
+<p align="center">
+  <img src="https://readme-typing-svg.herokuapp.com?font=Fira+Code&pause=1000&color=6366F1&center=true&vCenter=true&width=435&lines=AI-Powered+Meeting+Intelligence;Real-time+Transcription+%26+Analysis;Multi-Agent+AI+Architecture;Live+Streaming+Insights" alt="Typing SVG" />
+</p>
 
-### 🎨 Modern UI/UX
-- **Glass Morphism Design**: Beautiful liquid/glass UI elements
-- **Framer Motion Animations**: Smooth, professional interactions
-- **Responsive Layout**: Optimized for all device sizes
+[![React](https://img.shields.io/badge/React-20232A?style=for-the-badge&logo=react&logoColor=61DAFB)](https://reactjs.org/)
+[![TypeScript](https://img.shields.io/badge/TypeScript-007ACC?style=for-the-badge&logo=typescript&logoColor=white)](https://www.typescriptlang.org/)
+[![Firebase](https://img.shields.io/badge/Firebase-039BE5?style=for-the-badge&logo=Firebase&logoColor=white)](https://firebase.google.com/)
+[![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=for-the-badge&logo=tailwind-css&logoColor=white)](https://tailwindcss.com/)
+[![Vite](https://img.shields.io/badge/Vite-646CFF?style=for-the-badge&logo=vite&logoColor=white)](https://vitejs.dev/)
 
-## Getting Started
+<img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="900">
+
+</div>
+
+## ✨ What Makes It Special
+
+<table>
+<tr>
+<td width="50%">
+
+### 🧠 **AI-Powered Intelligence**
+- **Real-time Transcription**: Advanced speech-to-text processing
+- **Multi-Agent Architecture**: Specialized AI agents for different tasks
+- **Live Insights**: Streaming analysis with typewriter effects
+- **Smart Suggestions**: Context-aware recommendations
+
+</td>
+<td width="50%">
+
+### 🎯 **Key Features**
+- **Domain Intelligence**: Industry-specific knowledge
+- **Entity Extraction**: Automatic identification of key elements
+- **Person Enrichment**: Enhanced participant profiles
+- **RAG Integration**: Retrieval-Augmented Generation
+
+</td>
+</tr>
+</table>
+
+## 🚀 Live Demo
+
+<div align="center">
+
+### 🌟 **Experience the Future of Meetings**
+
+<a href="https://agentic-meeting-studio.web.app/" target="_blank">
+  <img src="https://user-images.githubusercontent.com/74038190/212284087-bbe7e430-757e-4901-90bf-4cd2ce3e1852.gif" width="50">
+  <br>
+  <strong>🔗 https://agentic-meeting-studio.web.app/</strong>
+</a>
+
+</div>
+
+## 🏗️ Architecture Overview
+
+```mermaid
+graph TB
+    A[🎤 Audio Input] --> B[🗣️ Speech-to-Text Agent]
+    B --> C[📊 Orchestrator]
+    C --> D[🧠 Domain Intelligence Agent]
+    C --> E[🔍 Entity Extraction Agent]
+    C --> F[👤 Person Enrichment Agent]
+    C --> G[📝 Suggestion Generator Agent]
+    C --> H[🔗 Retriever RAG Agent]
+    C --> I[📈 Ranking Contextualizer Agent]
+    D --> J[💡 Live Insights Panel]
+    E --> J
+    F --> J
+    G --> J
+    H --> J
+    I --> J
+    J --> K[✨ Real-time UI Updates]
+```
+
+## 🛠️ Technology Stack
+
+<div align="center">
+
+| Frontend | Backend | Database | Deployment | AI/ML |
+|:--------:|:-------:|:--------:|:----------:|:-----:|
+| <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/react/react-original.svg" width="40"> | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/nodejs/nodejs-original.svg" width="40"> | <img src="https://raw.githubusercontent.com/devicons/devicon/master/icons/firebase/firebase-plain.svg" width="40"> | <img src="https://user-images.githubusercontent.com/74038190/238200426-29fd6286-4e7b-4d6c-818f-c4765d5e39a9.gif" width="40"> | <img src="https://user-images.githubusercontent.com/74038190/212257467-871d32b7-e401-42e8-a166-fcfd7baa4c6b.gif" width="40"> |
+| React 18 | Node.js | Firestore | Firebase | OpenAI GPT |
+| TypeScript | Express | Real-time DB | Hosting | Custom Agents |
+
+</div>
+
+## 🎨 Features Showcase
+
+<details>
+<summary>🎭 <strong>Interactive UI Components</strong></summary>
+
+- **Glass Morphism Design**: Modern, translucent interface elements
+- **Animated Backgrounds**: Dynamic particle systems and gradients
+- **Real-time Visualizations**: Live data streaming with smooth animations
+- **Responsive Layout**: Seamless experience across all devices
+
+</details>
+
+<details>
+<summary>🤖 <strong>AI Agent System</strong></summary>
+
+- **Speech-to-Text Agent**: High-accuracy voice recognition
+- **Domain Intelligence Agent**: Industry-specific knowledge processing
+- **Entity Extraction Agent**: Automatic identification of people, places, concepts
+- **Person Enrichment Agent**: Enhanced participant information and context
+- **Suggestion Generator Agent**: Real-time actionable recommendations
+- **Retriever RAG Agent**: Knowledge base integration and retrieval
+- **Ranking Contextualizer Agent**: Priority-based insight organization
+
+</details>
+
+<details>
+<summary>🔥 <strong>Real-time Features</strong></summary>
+
+- **Live Transcription**: Instant speech-to-text conversion
+- **Streaming Insights**: Character-by-character AI analysis
+- **Dynamic Suggestions**: Context-aware recommendations
+- **Real-time Collaboration**: Multi-user meeting support
+
+</details>
+
+## 🚀 Getting Started
 
 ### Prerequisites
-- Node.js 18+ and npm
-- Firebase project
-- OpenAI API key (for production Whisper integration)
+
+<img src="https://user-images.githubusercontent.com/74038190/212257454-16e3712e-945a-4ca2-b238-408ad0bf87e6.gif" width="20"> **Node.js** (v18 or higher)  
+<img src="https://user-images.githubusercontent.com/74038190/212257472-08e52665-c503-4bd9-aa20-f5a4dae769b5.gif" width="20"> **Firebase Account**  
+<img src="https://user-images.githubusercontent.com/74038190/212257468-1e9a91f1-b626-4baa-b15d-5c385b7ccf23.gif" width="20"> **OpenAI API Key**
 
 ### Installation
 
-1. **Clone and install dependencies**:
 ```bash
+# Clone the repository
+git clone https://github.com/Ronit-bby/agentic-live-sales.git
+
+# Navigate to project directory
+cd agentic-live-sales
+
+# Install dependencies
 npm install
-```
 
-2. **Set up Firebase**:
-   - Create a new Firebase project
-   - Enable Authentication (Email/Password)
-   - Create a Firestore database
-   - Copy your config to `.env` file
+# Set up environment variables
+cp .env.example .env.local
+# Add your Firebase and OpenAI configurations
 
-3. **Configure environment variables**:
-```bash
-cp .env.example .env
-# Add your Firebase and OpenAI API keys
-```
-
-4. **Start development server**:
-```bash
+# Start development server
 npm run dev
 ```
 
-## Architecture
+<div align="center">
+<img src="https://user-images.githubusercontent.com/74038190/212284158-e840e285-664b-44d7-b79b-e264b5e54825.gif" width="400">
+</div>
 
-### Frontend Structure
-```
-src/
-├── components/          # Reusable UI components
-│   ├── Auth/           # Authentication forms
-│   ├── Layout/         # Layout components (GlassCard, etc.)
-│   └── Meeting/        # Meeting-specific components
-├── hooks/              # Custom React hooks
-├── lib/                # External service configurations
-├── pages/              # Main application pages
-├── services/           # Business logic and API integrations
-├── types/              # TypeScript type definitions
-└── utils/              # Utility functions
-```
+## 🎯 Usage
 
-### Key Services
+1. **🎤 Start Recording**: Click the record button to begin capturing audio
+2. **👀 Watch Live Transcription**: See real-time speech-to-text conversion
+3. **🧠 View AI Insights**: Monitor intelligent analysis as it streams in
+4. **💡 Get Suggestions**: Receive contextual recommendations during the meeting
+5. **📊 Review Analytics**: Access comprehensive meeting insights and summaries
 
-#### AI Agents (`services/aiAgents.ts`)
-- **Sales Agent**: Identifies opportunities, pain points, buying signals
-- **HR Agent**: Analyzes team dynamics, communication patterns
-- **Compliance Agent**: Monitors regulatory issues and risk factors
-- **Competitor Agent**: Tracks competitive mentions and positioning
-- **Action Items Agent**: Extracts tasks, deadlines, follow-ups
+## 🌟 Key Highlights
 
-#### Transcription (`services/transcription.ts`)
-- Web Speech API fallback for development
-- OpenAI Whisper integration for production
-- Real-time audio processing and text generation
+<div align="center">
 
-#### Firestore Integration (`services/firestore.ts`)
-- Real-time data synchronization
-- Meeting session management
-- Transcript and agent output storage
-- Complete data lifecycle management
+| Feature | Description | Status |
+|---------|-------------|--------|
+| 🎯 **Real-time Processing** | Live audio transcription and analysis | ✅ Active |
+| 🤖 **Multi-Agent AI** | Specialized agents for different tasks | ✅ Active |
+| 🔄 **Streaming Insights** | Character-by-character AI responses | ✅ Active |
+| 🎨 **Modern UI/UX** | Glass morphism and smooth animations | ✅ Active |
+| 🔐 **Secure Authentication** | Firebase-based user management | ✅ Active |
+| 📱 **Responsive Design** | Cross-platform compatibility | ✅ Active |
 
-## Data Models
+</div>
 
-### Meeting Session
-```typescript
-interface MeetingSession {
-  id: string;
-  title: string;
-  createdAt: Date;
-  updatedAt: Date;
-  userId: string;
-  isActive: boolean;
-  participants: string[];
-  duration: number;
-}
-```
+## 🤝 Contributing
 
-### Provenance Envelope
-```typescript
-interface ProvenanceEnvelope {
-  agent_id: string;
-  timestamp: Date;
-  inputs: {
-    transcript_segment: string;
-    context: string;
-    previous_outputs?: string[];
-  };
-  outputs: {
-    analysis: string;
-    insights: string[];
-    confidence_score: number;
-    reasoning_chain: string[];
-  };
-  confidence: number;
-  trace_id: string;
-}
-```
-
-## Deployment
-
-### Firebase Setup
-1. **Authentication**: Enable Email/Password provider
-2. **Firestore**: Create database with the following collections:
-   - `meetings` - Meeting sessions
-   - `transcripts` - Transcript entries
-   - `agentOutputs` - AI agent analyses
-
-3. **Security Rules**: Configure appropriate Firestore security rules
-
-### Production Deployment
-1. **Build the application**:
-```bash
-npm run build
-```
-
-2. **Deploy to your preferred hosting platform**
-3. **Set up environment variables** in your hosting platform
-4. **Configure Firebase** for production environment
-
-## Features in Detail
-
-### Provenance Tracking
-Every AI agent output includes complete provenance information:
-- **Input Context**: What data the agent analyzed
-- **Reasoning Chain**: Step-by-step decision process
-- **Confidence Scores**: Reliability metrics
-- **Trace IDs**: Unique identifiers for debugging
-
-### Real-time Updates
-- **Firestore Listeners**: Instant data synchronization
-- **Live Transcript**: Real-time speech-to-text display
-- **Agent Notifications**: Immediate AI analysis results
-
-### Glass Morphism UI
-- **Backdrop Blur Effects**: Modern glass-like appearance
-- **Smooth Animations**: Framer Motion powered interactions
-- **Responsive Design**: Optimized for all screen sizes
-- **Accessibility**: Full keyboard navigation and screen reader support
-
-## Browser Compatibility
-
-- **Chrome/Edge**: Full feature support including Web Speech API
-- **Firefox**: Core features (manual Whisper integration recommended)
-- **Safari**: Core features (manual Whisper integration recommended)
-- **Mobile**: Responsive design with touch-optimized interactions
-
-## Contributing
+<img src="https://user-images.githubusercontent.com/74038190/212284087-bbe7e430-757e-4901-90bf-4cd2ce3e1852.gif" width="30"> **We welcome contributions!**
 
 1. Fork the repository
-2. Create a feature branch
-3. Make your changes
-4. Add tests if applicable
-5. Submit a pull request
+2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
+3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
+4. Push to the branch (`git push origin feature/AmazingFeature`)
+5. Open a Pull Request
 
-## License
+## 📄 License
 
-MIT License - see LICENSE file for details
-=======
-# agentic-live-sales
->>>>>>> f3aba79c0423dbb43c9488197f3d886eb2257146
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
+
+## 👨‍💻 Author
+
+<div align="center">
+
+**Ronit** 
+
+[![GitHub](https://img.shields.io/badge/GitHub-100000?style=for-the-badge&logo=github&logoColor=white)](https://github.com/Ronit-bby)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0077B5?style=for-the-badge&logo=linkedin&logoColor=white)](https://linkedin.com/in/ronit-bby)
+
+</div>
+
+## 🙏 Acknowledgments
+
+- **OpenAI** for providing powerful AI capabilities
+- **Firebase** for robust backend infrastructure
+- **React** community for amazing components and tools
+- **Tailwind CSS** for beautiful styling utilities
+
+<div align="center">
+
+### 🌟 **Star this repository if you found it helpful!** 🌟
+
+<img src="https://user-images.githubusercontent.com/74038190/212284100-561aa473-3905-4a80-b561-0d28506553ee.gif" width="900">
+
+**Made with ❤️ and lots of ☕**
+
+</div>
